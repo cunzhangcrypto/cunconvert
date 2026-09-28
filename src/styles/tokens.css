@@ -1,0 +1,53 @@
+/* CunConvert 设计变量：亮色为主，支持深色/跟随系统 */
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f6f7f9;
+  --bg-tint: #eef2f7;
+  --card: #ffffff;
+  --text: #1a2233;
+  --text-soft: #55627a;
+  --text-faint: #8a94a8;
+  --border: #e3e7ee;
+  --border-strong: #cfd6e0;
+  --accent: #3b6ef6;
+  --accent-strong: #2a5be0;
+  --accent-soft: #e8efff;
+  --accent-text: #ffffff;
+  --ok: #1e9e5a;
+  --ok-soft: #e5f6ec;
+  --warn: #e08a00;
+  --warn-soft: #fdf3e0;
+  --danger: #d64545;
+  --danger-soft: #fdeaea;
+  --shadow-sm: 0 1px 2px rgba(23, 34, 56, 0.05), 0 1px 3px rgba(23, 34, 56, 0.06);
+  --shadow-md: 0 6px 24px rgba(23, 34, 56, 0.08);
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-sm: 8px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1520;
+  --bg-soft: #161e2c;
+  --bg-tint: #1b2535;
+  --card: #182130;
+  --text: #e6eaf2;
+  --text-soft: #a9b4c6;
+  --text-faint: #6f7b90;
+  --border: #2a3547;
+  --border-strong: #3a4659;
+  --accent: #5b84f8;
+  --accent-strong: #7b9dfa;
+  --accent-soft: #223354;
+  --accent-text: #ffffff;
+  --ok: #3ecf7c;
+  --ok-soft: #16301f;
+  --warn: #f0a83c;
+  --warn-soft: #382a12;
+  --danger: #f06666;
+  --danger-soft: #3a1a1a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
+}

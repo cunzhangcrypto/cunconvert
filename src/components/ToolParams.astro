@@ -1,0 +1,177 @@
+---
+interface Props {
+  controls?: string[];
+}
+const { controls = [] } = Astro.props;
+
+const show = (c: string) => controls.includes(c);
+---
+
+{
+  show('scale') && (
+    <div class="param-block">
+      <div class="param-label">导出倍率 <span class="hint">放大导出更清晰</span></div>
+      <div class="seg" data-param="scale">
+        <button type="button" data-value="1" class="active">1×</button>
+        <button type="button" data-value="2">2×</button>
+        <button type="button" data-value="3">3×</button>
+        <button type="button" data-value="4">4×</button>
+      </div>
+    </div>
+  )
+}
+
+{
+  show('size') && (
+    <div class="param-block">
+      <div class="param-label">输出尺寸</div>
+      <div class="seg" data-param="size-mode">
+        <button type="button" data-value="original" class="active">原始</button>
+        <button type="button" data-value="custom">自定义</button>
+      </div>
+      <div class="input-row" data-size-fields style="display:none;margin-top:8px">
+        <input type="number" class="input-num" data-param="width" min="1" placeholder="宽" inputmode="numeric" />
+        <span style="color:var(--text-faint)">×</span>
+        <input type="number" class="input-num" data-param="height" min="1" placeholder="高" inputmode="numeric" />
+        <label class="check"><input type="checkbox" data-param="lock" checked /> 锁定比例</label>
+      </div>
+    </div>
+  )
+}
+
+{
+  (show('background') || show('background-solid')) && (
+    <div class="param-block">
+      <div class="param-label">背景</div>
+      <div class="seg" data-param="background">
+        {show('background') && <button type="button" data-value="transparent" class="active">透明</button>}
+        <button type="button" data-value="white" class:list={[show('background-solid') && 'active']}>白</button>
+        <button type="button" data-value="black">黑</button>
+        <button type="button" data-value="custom">自定义</button>
+      </div>
+      <div class="input-row" style="margin-top:8px">
+        <input type="color" class="input-color" data-param="background-color" value="#ffffff" aria-label="自定义背景色" />
+        <input type="text" class="input-text" data-param="background-custom" value="#ffffff" placeholder="#ffffff" style="width:96px" />
+      </div>
+    </div>
+  )
+}
+
+{
+  show('quality') && (
+    <div class="param-block">
+      <div class="param-label">质量 <span class="hint">90</span></div>
+      <input type="range" class="input-num" data-param="quality" min="1" max="100" value="90" />
+    </div>
+  )
+}
+
+{
+  show('format') && (
+    <div class="param-block">
+      <div class="param-label">输出格式</div>
+      <div class="seg" data-param="format">
+        <button type="button" data-value="webp" class="active">WebP</button>
+        <button type="button" data-value="jpg">JPG</button>
+        <button type="button" data-value="png">PNG</button>
+      </div>
+    </div>
+  )
+}
+
+{
+  show('resizeSimple') && (
+    <div class="param-block">
+      <div class="param-label">输出尺寸</div>
+      <div class="seg" data-param="resize-mode">
+        <button type="button" data-value="none" class="active">不调整</button>
+        <button type="button" data-value="percent">按百分比</button>
+      </div>
+      <div class="input-row" style="display:none;margin-top:8px">
+        <input type="number" class="input-num" data-param="percent" min="1" max="200" value="50" placeholder="%" inputmode="numeric" />
+        <span class="hint">%</span>
+      </div>
+    </div>
+  )
+}
+
+{
+  show('resizeMode') && (
+    <div class="param-block">
+      <div class="param-label">调整方式</div>
+      <div class="seg" data-param="resize-mode">
+        <button type="button" data-value="px" class="active">像素</button>
+        <button type="button" data-value="percent">百分比</button>
+        <button type="button" data-value="quick">快捷尺寸</button>
+      </div>
+      <div class="input-row" style="margin-top:8px">
+        <input type="number" class="input-num" data-param="width" min="1" placeholder="宽" inputmode="numeric" />
+        <span style="color:var(--text-faint)">×</span>
+        <input type="number" class="input-num" data-param="height" min="1" placeholder="高" inputmode="numeric" />
+        <input type="number" class="input-num" data-param="percent" min="1" max="200" value="50" placeholder="%" inputmode="numeric" style="display:none" />
+        <select class="input-text" data-param="quick" style="display:none">
+          <option value="1920">1920 宽（高清桌面）</option>
+          <option value="1280">1280 宽</option>
+          <option value="800" selected>800 宽</option>
+          <option value="640">640 宽</option>
+        </select>
+        <label class="check"><input type="checkbox" data-param="lock" checked /> 锁定比例</label>
+      </div>
+    </div>
+  )
+}
+
+{
+  show('mode') && (
+    <div class="param-block">
+      <div class="param-label">模式</div>
+      <div class="seg" data-param="mode">
+        <button type="button" data-value="color" class="active">彩色</button>
+        <button type="button" data-value="gray">灰度</button>
+        <button type="button" data-value="bw">黑白</button>
+      </div>
+    </div>
+  )
+}
+
+{
+  show('colors') && (
+    <div class="param-block">
+      <div class="param-label">颜色数量 <span class="hint">8</span></div>
+      <input type="range" class="input-num" data-param="colors" min="2" max="32" value="8" />
+    </div>
+  )
+}
+
+{
+  show('detail') && (
+    <div class="param-block">
+      <div class="param-label">细节 <span class="hint">50</span></div>
+      <input type="range" class="input-num" data-param="detail" min="0" max="100" value="50" />
+    </div>
+  )
+}
+
+{
+  show('smooth') && (
+    <div class="param-block">
+      <div class="param-label">平滑 <span class="hint">50</span></div>
+      <input type="range" class="input-num" data-param="smooth" min="0" max="100" value="50" />
+    </div>
+  )
+}
+
+{
+  show('svgoMode') && (
+    <div class="param-block">
+      <div class="param-label">优化模式</div>
+      <div class="seg" data-param="svgo-mode">
+        <button type="button" data-value="simple" class="active">简单模式</button>
+        <button type="button" data-value="advanced">高级模式</button>
+      </div>
+      <div class="input-row" style="display:none;margin-top:8px">
+        <label class="check"><input type="checkbox" data-param="keep-viewbox" checked /> 保留 viewBox</label>
+      </div>
+    </div>
+  )
+}

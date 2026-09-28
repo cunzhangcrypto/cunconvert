@@ -1,0 +1,13 @@
+# 依赖
+node_modules/
+.astro/
+dist/
+
+# 系统与编辑器
+.DS_Store
+Thumbs.db
+*.log
+
+# 环境变量
+.env
+.env.*

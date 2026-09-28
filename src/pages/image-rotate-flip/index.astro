@@ -1,0 +1,21 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="image-rotate-flip" actionLabel="旋转并下载" icon="🔄" resultTitle="处理结果">
+  <div class="param-block">
+    <div class="param-label">旋转角度</div>
+    <div class="seg" data-param="rotate">
+      <button type="button" data-value="0" class="active">0°</button>
+      <button type="button" data-value="90">90°</button>
+      <button type="button" data-value="180">180°</button>
+      <button type="button" data-value="270">270°</button>
+    </div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">翻转</div>
+    <div class="input-row">
+      <label class="check"><input type="checkbox" data-param="flipH" /> 水平翻转</label>
+      <label class="check"><input type="checkbox" data-param="flipV" /> 垂直翻转</label>
+    </div>
+  </div>
+</ToolPage>

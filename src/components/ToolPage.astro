@@ -1,0 +1,122 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ConvertShell from '../components/ConvertShell.astro';
+import { getTool, relatedTools } from '../data/tools';
+import { getGuide } from '../data/guides';
+
+interface Props {
+  slug: string;
+  actionLabel?: string;
+  icon?: string;
+  resultTitle?: string;
+}
+
+const { slug, actionLabel, icon, resultTitle } = Astro.props;
+const tool = getTool(slug);
+const guide = getGuide(slug);
+const related = tool ? relatedTools(tool) : [];
+const site = Astro.site;
+const canonical = new URL(`/${slug}/`, site ?? 'https://cunconvert.example.com/').href;
+
+if (!tool) throw new Error(`未找到工具：${slug}`);
+
+const webAppLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: tool.name,
+  url: canonical,
+  description: tool.description,
+  applicationCategory: 'UtilitiesApplication',
+  operatingSystem: 'Any',
+  browserRequirements: '需要现代浏览器',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'CNY' },
+  inLanguage: 'zh-CN',
+};
+
+const faqLd = guide
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: guide.faq.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    }
+  : null;
+
+const jsonLd = [JSON.stringify(webAppLd), faqLd ? JSON.stringify(faqLd) : ''].filter(Boolean);
+---
+
+<BaseLayout title={tool.title} description={tool.description} canonical={canonical} jsonLd={jsonLd}>
+  <div class="container page">
+    <div class="tool-header">
+      <h1>{tool.h1}</h1>
+      <p class="intro">{tool.intro}</p>
+    </div>
+
+    <ConvertShell slug={slug} accept={tool.accept} actionLabel={actionLabel} icon={icon} resultTitle={resultTitle}>
+      <div class="params-panel"><slot /></div>
+    </ConvertShell>
+
+    {
+      related.length > 0 && (
+        <section class="related">
+          <h2>相关工具</h2>
+          <div class="related-grid">
+            {related.map((t) => (
+              <a href={`/${t.slug}/`}>
+                {t.name}
+                <br />
+                <small style="color:var(--text-faint);font-weight:400">{t.short}</small>
+              </a>
+            ))}
+          </div>
+        </section>
+      )
+    }
+
+    {
+      guide && (
+        <article class="guide">
+          <div class="guide-intro">{guide.lead}</div>
+          {guide.sections.map((s) => (
+            <section>
+              <h2>{s.h2}</h2>
+              {s.paragraphs.map((p) => <p set:html={p} />)}
+              {
+                s.list && s.list.length > 0 && (
+                  <ul>
+                    {s.list.map((li) => <li set:html={li} />)}
+                  </ul>
+                )
+              }
+            </section>
+          ))}
+        </article>
+      )
+    }
+
+    {
+      guide && guide.faq.length > 0 && (
+        <section class="faq-section">
+          <h2>常见问题</h2>
+          {guide.faq.map((f) => (
+            <details class="faq-item">
+              <summary>{f.q}</summary>
+              <div class="faq-answer">{f.a}</div>
+            </details>
+          ))}
+        </section>
+      )
+    }
+  </div>
+</BaseLayout>
+
+<script>
+  import { mountTool } from '../scripts/tool-loader';
+  const root = document.querySelector<HTMLElement>('[data-tool]');
+  if (root && root.dataset.tool) {
+    void mountTool(root, root.dataset.tool);
+  }
+</script>

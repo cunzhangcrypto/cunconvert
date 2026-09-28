@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const site = Astro.site;
+const canonical = new URL('/about/', site ?? 'https://cunconvert.example.com/').href;
+---
+
+<BaseLayout
+  title="关于我们 - CunConvert | 本地图片与 SVG 工具箱"
+  description="关于 CunConvert：一个在浏览器本地处理图片与 SVG 的免费工具箱，文件不上传服务器，无需注册。"
+  canonical={canonical}
+>
+  <div class="container page">
+    <div class="tool-header">
+      <h1>关于 CunConvert</h1>
+      <p class="intro">把常用的图片处理工具做得简单、快速、私密。</p>
+    </div>
+    <div class="plain-page">
+      <h2>为什么做 CunConvert？</h2>
+      <p>
+        日常处理图片时，很多在线工具要求上传文件，既慢又让人担心隐私。CunConvert 的全部功能都在浏览器本地完成：选择文件后，处理只发生在你的设备上，没有上传，没有等待。
+      </p>
+      <h2>包含哪些工具？</h2>
+      <ul>
+        <li>SVG 工具：SVG 转 PNG / JPG / WebP、SVG 优化、SVG 查看</li>
+        <li>图片转换：PNG / JPG / WebP 两两互转</li>
+        <li>图片处理：压缩、调整尺寸、裁剪、旋转与翻转</li>
+        <li>图片矢量化：PNG / JPG / WebP 转 SVG</li>
+      </ul>
+      <p>所有工具均支持多文件批量处理，并可一键打包为 ZIP 下载。</p>
+      <h2>技术说明</h2>
+      <p>
+        CunConvert 基于 Astro 与原生 TypeScript 构建，静态托管于 Cloudflare Pages 等平台，不包含任何后端服务。图片处理使用浏览器内置的 Canvas 与 Web Worker 能力，SVG 优化使用开源的 SVGO，图片矢量化使用开源的 ImageTracer。
+      </p>
+      <h2>联系我们</h2>
+      <p>
+        如果你发现工具问题或有功能建议，欢迎到项目的 GitHub 仓库提交 Issue。
+      </p>
+    </div>
+  </div>
+</BaseLayout>

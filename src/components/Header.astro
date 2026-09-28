@@ -1,0 +1,59 @@
+---
+import { toolCategories, toolsByCategory } from '../data/tools';
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="logo" href="/" aria-label="CunConvert 首页">
+      <span class="logo-mark">C</span>
+      <span>CunConvert</span>
+      <span class="logo-tag">本地工具</span>
+    </a>
+    <nav class="nav">
+      <details class="nav-drop">
+        <summary class="nav-drop-btn">全部工具<span class="caret">▾</span></summary>
+        <div class="drop-panel">
+          {toolCategories.map((cat) => (
+            <div class="drop-group">
+              <div class="drop-title">{cat.icon} {cat.label}</div>
+              {toolsByCategory(cat.key).map((t) => (
+                <a href={`/${t.slug}/`}><span>{t.name}</span><small>{t.short}</small></a>
+              ))}
+            </div>
+          ))}
+        </div>
+      </details>
+      <a class="nav-link-label" href="/privacy/">隐私</a>
+      <a class="nav-link-label" href="/about/">关于</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换明暗主题">◐</button>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav-drop summary::-webkit-details-marker {
+    display: none;
+  }
+  .nav-drop summary {
+    list-style: none;
+  }
+  .nav-drop .caret {
+    font-size: 10px;
+    color: var(--text-faint);
+    transition: transform 0.15s ease;
+  }
+  .nav-drop[open] .caret {
+    transform: rotate(180deg);
+  }
+</style>
+
+<script is:inline>
+  document.querySelector('[data-theme-toggle]')?.addEventListener('click', function () {
+    var html = document.documentElement;
+    var next = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    html.dataset.theme = next;
+    try {
+      localStorage.setItem('cunconvert-theme', next);
+    } catch (e) {}
+  });
+</script>

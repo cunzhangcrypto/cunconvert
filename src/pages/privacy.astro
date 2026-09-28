@@ -1,0 +1,45 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const site = Astro.site;
+const canonical = new URL('/privacy/', site ?? 'https://cunconvert.example.com/').href;
+---
+
+<BaseLayout
+  title="隐私政策 - CunConvert | 文件不上传的本地图片工具"
+  description="CunConvert 隐私政策：所有图片与 SVG 文件均在浏览器本地处理，不会上传到任何服务器，无需注册、无追踪 Cookie。"
+  canonical={canonical}
+>
+  <div class="container page">
+    <div class="tool-header">
+      <h1>隐私政策</h1>
+      <p class="intro">CunConvert 的设计原则：你的文件永远留在你的设备上。</p>
+    </div>
+    <div class="plain-page">
+      <h2>1. 文件不上传</h2>
+      <p>
+        本站所有工具（格式转换、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化、图片矢量化等）均在浏览器本地完成处理。你选择的文件不会离开你的设备，也不会被上传到任何服务器。
+      </p>
+      <h2>2. 我们收集哪些信息？</h2>
+      <p>
+        我们不需要注册账号，不收集你的个人身份信息，不使用分析追踪脚本。站点托管方（如 Cloudflare）可能会记录标准的访问日志（如 IP、浏览器类型、访问时间），这是网站运行的正常组成部分，我们不会将日志用于用户画像。
+      </p>
+      <h2>3. 本地存储</h2>
+      <p>
+        仅在你主动点击"切换明暗主题"后，浏览器会使用 localStorage 记住你的主题偏好。此外不写入任何本地数据。
+      </p>
+      <h2>4. 第三方库</h2>
+      <p>
+        部分工具会在需要时从 CDN 加载开源的图像处理库（如 svgo、imagetracerjs）。这些库运行在你的浏览器中，不会传输你的文件。
+      </p>
+      <h2>5. 关于外部链接</h2>
+      <p>
+        本站可能包含指向其他网站的链接，这些网站的隐私政策与本政策无关。
+      </p>
+      <h2>6. 联系我们</h2>
+      <p>
+        如对本隐私政策有任何疑问，欢迎通过<a href="/about/">关于页面</a>的联系方式与我们沟通。
+      </p>
+    </div>
+  </div>
+</BaseLayout>

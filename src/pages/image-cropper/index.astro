@@ -1,0 +1,52 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="image-cropper" actionLabel="裁剪并下载" icon="✂️" resultTitle="裁剪结果">
+  <div class="crop-stage" data-crop-stage hidden>
+    <div class="param-label">拖动四角调整裁剪区域，可整体拖动；可先旋转或翻转</div>
+    <div class="crop-canvas-wrap" data-crop-wrap>
+      <canvas data-crop-canvas></canvas>
+    </div>
+    <div class="input-row" style="margin-top:10px">
+      <div class="seg" data-param="crop-ratio">
+        <button type="button" data-value="free" class="active">自由</button>
+        <button type="button" data-value="1:1">1:1</button>
+        <button type="button" data-value="4:3">4:3</button>
+        <button type="button" data-value="3:2">3:2</button>
+        <button type="button" data-value="16:9">16:9</button>
+        <button type="button" data-value="9:16">9:16</button>
+      </div>
+      <div class="seg" data-param="crop-rotate">
+        <button type="button" data-value="0" class="active">0°</button>
+        <button type="button" data-value="90">90°</button>
+        <button type="button" data-value="180">180°</button>
+        <button type="button" data-value="270">270°</button>
+      </div>
+      <label class="check"><input type="checkbox" data-param="crop-flipH" /> 水平翻转</label>
+      <label class="check"><input type="checkbox" data-param="crop-flipV" /> 垂直翻转</label>
+    </div>
+  </div>
+</ToolPage>
+
+<style is:global>
+  .crop-overlay {
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    box-shadow: 0 0 0 9999px rgba(10, 18, 34, 0.4);
+    cursor: move;
+    touch-action: none;
+  }
+  .crop-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: var(--accent);
+    border: 2px solid #fff;
+    border-radius: 3px;
+    box-sizing: border-box;
+  }
+  .crop-handle[data-handle="nw"] { left: -6px; top: -6px; cursor: nwse-resize; }
+  .crop-handle[data-handle="ne"] { right: -6px; top: -6px; cursor: nesw-resize; }
+  .crop-handle[data-handle="sw"] { left: -6px; bottom: -6px; cursor: nesw-resize; }
+  .crop-handle[data-handle="se"] { right: -6px; bottom: -6px; cursor: nwse-resize; }
+</style>

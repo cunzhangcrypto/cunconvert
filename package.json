@@ -1,0 +1,23 @@
+{
+  "name": "cunconvert",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CunConvert - 本地图片与 SVG 工具箱（浏览器本地处理，文件不上传服务器）",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.3.0",
+    "astro": "^7.3.0",
+    "jszip": "^3.10.2",
+    "svgo": "^4.1.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

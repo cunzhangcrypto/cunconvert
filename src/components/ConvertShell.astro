@@ -1,0 +1,37 @@
+---
+interface Props {
+  slug: string;
+  accept: string;
+  actionLabel?: string;
+  icon?: string;
+  resultTitle?: string;
+}
+const { slug, accept, actionLabel = '开始转换', icon = '🖼️', resultTitle = '转换结果' } = Astro.props;
+---
+
+<div class="convert-shell" data-tool={slug}>
+  <div class="upload-zone" data-dropzone>
+    <span class="uz-icon">{icon}</span>
+    <p class="uz-main">点击 <button type="button" class="link" data-browse>选择文件</button>，或将文件拖拽到此处</p>
+    <p class="uz-sub">支持 {accept} · 可多选 · 文件仅在浏览器本地处理，不会上传</p>
+    <input type="file" hidden data-file-input multiple accept={accept} />
+  </div>
+  <div class="file-list" data-file-list></div>
+  <slot />
+  <div class="actions">
+    <button type="button" class="btn-primary" data-action="convert">{actionLabel}</button>
+    <button type="button" class="btn-secondary" data-action="clear">清空</button>
+  </div>
+  <div class="progress" hidden data-progress>
+    <div class="bar"><i></i></div>
+    <span class="ptext" data-progress-text></span>
+  </div>
+  <div class="results" hidden data-result-list>
+    <div class="results-head">
+      <span>{resultTitle}</span>
+      <button type="button" class="btn-small" data-action="zip">下载全部（ZIP）</button>
+    </div>
+    <div data-result-items></div>
+  </div>
+  <div data-notice></div>
+</div>

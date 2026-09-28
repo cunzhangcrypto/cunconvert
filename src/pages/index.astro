@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { toolCategories, toolsByCategory } from '../data/tools';
+
+const site = Astro.site;
+const canonical = new URL('/', site ?? 'https://cunconvert.example.com/').href;
+const jsonLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: 'CunConvert',
+  url: canonical,
+  description: '本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。文件均在浏览器本地处理，不会上传。',
+  inLanguage: 'zh-CN',
+});
+---
+
+<BaseLayout
+  title="CunConvert - 本地图片与 SVG 工具箱（文件不上传）"
+  description="免费在线图片与 SVG 工具箱：SVG 转 PNG/JPG/WebP、PNG/JPG/WebP 互转、图片压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与图片矢量化。所有文件在浏览器本地处理，不会上传服务器。"
+  canonical={canonical}
+  jsonLd={[jsonLd]}
+>
+  <div class="container">
+    <section class="hero">
+      <span class="hero-badge">🔒 文件不上传 · 全部在浏览器本地处理</span>
+      <h1>本地图片与 SVG 工具箱</h1>
+      <p class="hero-sub">格式转换 · 压缩 · 调整尺寸 · 裁剪 · SVG 优化与矢量化</p>
+      <p class="hero-trust">无需注册，无需上传。你的文件永远不会离开设备。</p>
+    </section>
+
+    {
+      toolCategories.map((cat) => (
+        <section class="tool-grid-section">
+          <h2>
+            <span class="sec-icon">{cat.icon}</span>
+            {cat.label}
+          </h2>
+          <div class="tool-grid">
+            {toolsByCategory(cat.key).map((t) => (
+              <a class="tool-card" href={`/${t.slug}/`}>
+                <div class="tc-name">{t.name}</div>
+                <div class="tc-desc">{t.short}</div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ))
+    }
+  </div>
+</BaseLayout>
