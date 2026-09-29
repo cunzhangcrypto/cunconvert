@@ -102,7 +102,7 @@ const show = (c: string) => controls.includes(c);
       <div class="seg" data-param="resize-mode">
         <button type="button" data-value="px" class="active">像素</button>
         <button type="button" data-value="percent">百分比</button>
-        <button type="button" data-value="quick">快捷尺寸</button>
+        <button type="button" data-value="quick">平台预设</button>
       </div>
       <div class="input-row" style="margin-top:8px">
         <input type="number" class="input-num" data-param="width" min="1" placeholder="宽" inputmode="numeric" />
@@ -110,12 +110,17 @@ const show = (c: string) => controls.includes(c);
         <input type="number" class="input-num" data-param="height" min="1" placeholder="高" inputmode="numeric" />
         <input type="number" class="input-num" data-param="percent" min="1" max="200" value="50" placeholder="%" inputmode="numeric" style="display:none" />
         <select class="input-text" data-param="quick" style="display:none">
-          <option value="1920">1920 宽（高清桌面）</option>
+          <option value="" selected>选择尺寸预设…</option>
+          <option value="1920">1920 宽（高清横图）</option>
           <option value="1280">1280 宽</option>
-          <option value="800" selected>800 宽</option>
+          <option value="800">800 宽</option>
           <option value="640">640 宽</option>
+          <option value="1920x1080:cover|1280x720:cover">YouTube（1920×1080 + 1280×720，铺满裁剪）</option>
+          <option value="1920x1080:cover|1440x1080:blur">B站（1920×1080 铺满 + 1440×1080 模糊背景）</option>
+          <option value="1080x1440:blur">小红书 封面（1080×1440 模糊背景）</option>
+          <option value="1080x1920:blur">视频号 / 抖音 竖屏（1080×1920 模糊背景）</option>
         </select>
-        <label class="check"><input type="checkbox" data-param="lock" checked /> 锁定比例</label>
+        <label class="check" data-lock-label><input type="checkbox" data-param="lock" checked /> 锁定比例</label>
       </div>
     </div>
   )
@@ -130,6 +135,9 @@ const show = (c: string) => controls.includes(c);
         <button type="button" data-value="gray">灰度</button>
         <button type="button" data-value="bw">黑白</button>
       </div>
+      <div class="param-note">彩色：保留原图颜色</div>
+      <div class="param-note">灰度：去掉颜色，只留黑白灰</div>
+      <div class="param-note">黑白：仅纯黑与纯白</div>
     </div>
   )
 }
@@ -137,8 +145,10 @@ const show = (c: string) => controls.includes(c);
 {
   show('colors') && (
     <div class="param-block">
-      <div class="param-label">颜色数量 <span class="hint">8</span></div>
+      <div class="param-label">颜色数量</div>
       <input type="range" class="input-num" data-param="colors" min="2" max="32" value="8" />
+      <div class="param-note">调小：颜色少、画面简洁</div>
+      <div class="param-note">调大：保留更多颜色层次</div>
     </div>
   )
 }
@@ -146,8 +156,10 @@ const show = (c: string) => controls.includes(c);
 {
   show('detail') && (
     <div class="param-block">
-      <div class="param-label">细节 <span class="hint">50</span></div>
+      <div class="param-label">细节</div>
       <input type="range" class="input-num" data-param="detail" min="0" max="100" value="50" />
+      <div class="param-note">调小：轮廓更简洁、更平滑</div>
+      <div class="param-note">调大：保留更多轮廓和纹理</div>
     </div>
   )
 }
@@ -155,8 +167,10 @@ const show = (c: string) => controls.includes(c);
 {
   show('smooth') && (
     <div class="param-block">
-      <div class="param-label">平滑 <span class="hint">50</span></div>
+      <div class="param-label">平滑</div>
       <input type="range" class="input-num" data-param="smooth" min="0" max="100" value="50" />
+      <div class="param-note">调小：边缘更锐利</div>
+      <div class="param-note">调大：边缘更柔和、阴影更整体</div>
     </div>
   )
 }

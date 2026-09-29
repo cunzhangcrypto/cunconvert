@@ -18,6 +18,7 @@ const map: Record<string, () => Promise<ToolModule>> = {
   'image-resizer': () => import('./resize'),
   'image-cropper': () => import('./crop'),
   'image-rotate-flip': () => import('./rotate'),
+  'remove-background': () => import('./remove-bg'),
   'svg-optimizer': () => import('./svg-optimize'),
   'svg-viewer': () => import('./svg-view'),
   'png-to-svg': () => import('./vectorize'),

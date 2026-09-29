@@ -55,14 +55,16 @@ export function buildTracerOptions(opts: {
   } else {
     base.colorsampling = 2;
     base.numberofcolors = Math.max(2, Math.min(32, Math.round(opts.colors)));
-    base.mincolorratio = 0.01;
+    base.mincolorratio = 0.02;
     base.colorquantcycles = 3;
   }
-  // detail 0-100 -> pathomit 8-0（数值越大路径越少）；平滑 0-100 -> blurradius 0-8
-  base.pathomit = base.pathomit ?? Math.max(0, Math.min(8, Math.round(8 - (opts.detail / 100) * 8)));
-  base.ltres = 0.5 + (opts.detail / 100) * 1.2;
-  base.qtres = 0.4 + (opts.detail / 100) * 1.4;
-  base.blurradius = (opts.smoothing / 100) * 8;
-  base.blurdelta = (opts.smoothing / 100) * 8;
+  // detail 0-100 -> pathomit 12-4（数值越大丢弃的小路径越多，输出越干净）
+  base.pathomit = base.pathomit ?? Math.max(2, Math.min(12, Math.round(12 - (opts.detail / 100) * 8)));
+  // 路径平滑度：ltres/qtres 越大轮廓越平滑（折线感越弱），细节相应减少
+  base.ltres = 0.9 + (opts.detail / 100) * 1.3;
+  base.qtres = 0.7 + (opts.detail / 100) * 1.5;
+  // 预模糊：摊平渐变阴影、滤除噪点，避免碎块；平滑越高越整体
+  base.blurradius = 2 + (opts.smoothing / 100) * 8;
+  base.blurdelta = 2 + (opts.smoothing / 100) * 8;
   return base;
 }

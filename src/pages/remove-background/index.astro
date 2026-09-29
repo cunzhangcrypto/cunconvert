@@ -1,0 +1,29 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="remove-background" actionLabel="移除背景" icon="🪄" resultTitle="处理结果">
+  <div class="param-block">
+    <div class="param-label">背景色</div>
+    <div class="seg" data-param="bg-color">
+      <button type="button" data-value="#ffffff" class="active">白色</button>
+      <button type="button" data-value="#00ff00">绿色</button>
+      <button type="button" data-value="#0000ff">蓝色</button>
+      <button type="button" data-value="custom">自定义</button>
+    </div>
+    <div class="input-row" style="margin-top:8px">
+      <input type="color" class="input-color" data-param="bg-color-custom" value="#00ff00" aria-label="自定义背景色" />
+      <input type="text" class="input-text" data-param="bg-color-text" value="#00ff00" placeholder="#00ff00" style="width:96px" />
+    </div>
+    <div class="param-note">选择要移除的背景颜色，与它接近的像素会变成透明</div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">容差 <span class="hint">25</span></div>
+    <input type="range" class="input-num" data-param="bg-tolerance" min="0" max="100" value="25" />
+    <div class="param-note">调小：只移除非常接近背景色的像素</div>
+    <div class="param-note">调大：颜色相近的像素也会移除，但可能误删主体边缘</div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">边缘羽化</div>
+    <label class="check"><input type="checkbox" data-param="bg-feather" checked /> 平滑边缘过渡，减少锯齿</label>
+  </div>
+</ToolPage>

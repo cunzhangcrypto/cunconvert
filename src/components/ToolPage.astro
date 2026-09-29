@@ -1,8 +1,9 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ConvertShell from '../components/ConvertShell.astro';
-import { getTool, relatedTools } from '../data/tools';
+import { getTool, relatedTools, toolCategories } from '../data/tools';
 import { getGuide } from '../data/guides';
+import { canonicalUrl } from '../lib/utils/site';
 
 interface Props {
   slug: string;
@@ -15,8 +16,7 @@ const { slug, actionLabel, icon, resultTitle } = Astro.props;
 const tool = getTool(slug);
 const guide = getGuide(slug);
 const related = tool ? relatedTools(tool) : [];
-const site = Astro.site;
-const canonical = new URL(`/${slug}/`, site ?? 'https://cunconvert.example.com/').href;
+const canonical = canonicalUrl(`/${slug}/`);
 
 if (!tool) throw new Error(`未找到工具：${slug}`);
 
@@ -45,12 +45,34 @@ const faqLd = guide
     }
   : null;
 
-const jsonLd = [JSON.stringify(webAppLd), faqLd ? JSON.stringify(faqLd) : ''].filter(Boolean);
+// 面包屑：首页 > 分类 > 当前工具
+const catLabel = toolCategories.find((c) => c.key === tool.category)?.label ?? '';
+const breadcrumbLd = canonical
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: '首页', item: canonicalUrl('/') },
+        { '@type': 'ListItem', position: 2, name: catLabel, item: canonicalUrl('/') },
+        { '@type': 'ListItem', position: 3, name: tool.name, item: canonical },
+      ],
+    }
+  : null;
+
+const jsonLd = [
+  JSON.stringify(webAppLd),
+  faqLd ? JSON.stringify(faqLd) : '',
+  breadcrumbLd ? JSON.stringify(breadcrumbLd) : '',
+].filter(Boolean);
 ---
 
 <BaseLayout title={tool.title} description={tool.description} canonical={canonical} jsonLd={jsonLd}>
   <div class="container page">
     <div class="tool-header">
+      <span class="tool-local-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+        文件在浏览器本地处理，不会上传
+      </span>
       <h1>{tool.h1}</h1>
       <p class="intro">{tool.intro}</p>
     </div>

@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { canonicalUrl } from '../lib/utils/site';
 
-const site = Astro.site;
-const canonical = new URL('/404', site ?? 'https://cunconvert.example.com/').href;
+const canonical = canonicalUrl('/404');
 ---
 
 <BaseLayout
@@ -12,6 +12,14 @@ const canonical = new URL('/404', site ?? 'https://cunconvert.example.com/').hre
 >
   <div class="container">
     <div class="notfound">
+      <a class="logo" href="/" aria-label="CunConvert 首页" style="justify-content:center;margin-bottom:24px">
+        <span class="logo-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 11h15M8 7l-3.5 4L8 15M16 7l3.5 4-3.5 4"/>
+          </svg>
+        </span>
+        <span>CunConvert</span>
+      </a>
       <h1>404</h1>
       <p>你访问的页面不存在或已被移动。</p>
       <p style="margin-top:20px">

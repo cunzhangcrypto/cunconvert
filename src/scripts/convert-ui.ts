@@ -15,9 +15,10 @@ export interface ConvertOutput {
 
 export interface ConvertToolOptions {
   /**
-   * 转换单文件。抛出的异常会被转为中文提示。
+   * 转换单文件（可返回多张结果，如平台预设一次输出多个规格）。
+   * 抛出的异常会被转为中文提示。
    */
-  convert(file: File, params: Params, info: { index: number; total: number }): Promise<ConvertOutput>;
+  convert(file: File, params: Params, info: { index: number; total: number }): Promise<ConvertOutput | ConvertOutput[]>;
   /** 自定义参数读取（如裁剪工具需要读取画布选区） */
   getParams?(scope: HTMLElement): Params;
   /** 文件加入列表后的回调（如裁剪工具需要加载首张图到画布） */
@@ -31,7 +32,7 @@ interface FileItem {
   row: HTMLElement;
   thumb: HTMLImageElement;
   status: HTMLElement;
-  result?: ConvertOutput;
+  results: ConvertOutput[];
 }
 
 /**
@@ -75,6 +76,43 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
 
   function clearNotice(): void {
     if (notice) notice.innerHTML = '';
+  }
+
+  /** 居中弹窗提示处理完成，3 秒后自动关闭 */
+  function showDoneModal(title: string, sub: string): void {
+    const mask = document.createElement('div');
+    mask.className = 'done-mask';
+    const card = document.createElement('div');
+    card.className = 'done-modal';
+    const icon = document.createElement('div');
+    icon.className = 'done-icon';
+    icon.textContent = '✓';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'done-title';
+    titleEl.textContent = title;
+    const subEl = document.createElement('div');
+    subEl.className = 'done-sub';
+    subEl.textContent = sub;
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'done-close';
+    close.textContent = '知道了';
+    card.append(icon, titleEl, subEl, close);
+    mask.appendChild(card);
+    document.body.appendChild(mask);
+
+    let closed = false;
+    const closeFn = () => {
+      if (closed) return;
+      closed = true;
+      mask.classList.add('leaving');
+      setTimeout(() => mask.remove(), 200);
+    };
+    close.addEventListener('click', closeFn);
+    mask.addEventListener('click', (e) => {
+      if (e.target === mask) closeFn();
+    });
+    setTimeout(closeFn, 3200);
   }
 
   function addFiles(list: FileList | null): void {
@@ -135,7 +173,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     row.append(img, info, status, del);
     fileList?.appendChild(row);
 
-    items.push({ file, row, thumb: img, status });
+    items.push({ file, row, thumb: img, status, results: [] });
   }
 
   function syncConvertState(): void {
@@ -173,11 +211,11 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
           if (progressBar) progressBar.style.width = `${(i / items.length) * 100}%`;
           try {
             const out = await opts.convert(item.file, params, { index: i, total: items.length });
-            item.result = out;
-            setStatus(item, '已完成', 'done');
+            item.results = Array.isArray(out) ? out : [out];
+            setStatus(item, item.results.length > 1 ? `已完成 ${item.results.length} 张` : '已完成', 'done');
             renderResult(item);
           } catch (e) {
-            item.result = undefined;
+            item.results = [];
             setStatus(item, '失败', 'failed');
             if (!firstError) firstError = toUserMessage(e);
           }
@@ -190,13 +228,25 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
         },
       );
 
-      if (progress) progress.hidden = true;
-      if (items.some((it) => it.result)) {
+      const doneCount = items.filter((it) => it.results.length > 0).length;
+      const failCount = items.length - doneCount;
+      if (doneCount > 0) {
+        if (progressText) progressText.textContent = failCount === 0 ? '转换完成' : `转换完成，${failCount} 个失败`;
+        if (progressBar) progressBar.style.width = '100%';
+        if (progress) setTimeout(() => { progress.hidden = true; }, 1600);
+      } else {
+        if (progress) progress.hidden = true;
+      }
+      if (doneCount > 0) {
         if (results) results.hidden = false;
         if (zipBtn) zipBtn.disabled = false;
+        showDoneModal(
+          failCount === 0 ? '处理完成' : '处理完成（部分失败）',
+          failCount === 0 ? `成功转换 ${doneCount} 个文件，可点击下载` : `成功 ${doneCount} 个，失败 ${failCount} 个`,
+        );
       }
       if (firstError) showNotice(firstError);
-      if (!items.some((it) => it.result) && !firstError) {
+      if (doneCount === 0 && !firstError) {
         showNotice('没有文件处理成功，请检查文件格式后重试', 'warn');
       }
     } finally {
@@ -206,57 +256,58 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
   }
 
   async function renderResult(item: FileItem): Promise<void> {
-    const out = item.result;
-    if (!out || !resultItems) return;
+    for (const out of item.results) {
+      if (!resultItems) return;
 
-    let thumbUrl = '';
-    try {
-      thumbUrl = opts.preview ? await opts.preview(out.blob) : URL.createObjectURL(out.blob);
-      if (thumbUrl) urls.push(thumbUrl);
-    } catch {
-      thumbUrl = '';
+      let thumbUrl = '';
+      try {
+        thumbUrl = opts.preview ? await opts.preview(out.blob) : URL.createObjectURL(out.blob);
+        if (thumbUrl) urls.push(thumbUrl);
+      } catch {
+        thumbUrl = '';
+      }
+
+      const row = document.createElement('div');
+      row.className = 'result-row';
+
+      const thumb = document.createElement('img');
+      thumb.className = 'result-thumb';
+      thumb.alt = out.name;
+      if (thumbUrl) thumb.src = thumbUrl;
+
+      const info = document.createElement('div');
+      info.className = 'result-info';
+      const name = document.createElement('div');
+      name.className = 'ri-name';
+      name.textContent = out.name;
+      name.title = out.name;
+      const meta = document.createElement('div');
+      meta.className = 'ri-meta';
+      const sizeText = formatBytes(out.blob.size);
+      let metaText = sizeText;
+      if (out.width && out.height) metaText = `${out.width}×${out.height} · ${sizeText}`;
+      meta.textContent = metaText;
+      if (typeof out.savedPercent === 'number') {
+        const save = document.createElement('span');
+        save.className = 'ri-save';
+        save.textContent = out.savedPercent >= 0 ? `节省 ${out.savedPercent}%` : `体积增大 ${-out.savedPercent}%`;
+        meta.appendChild(save);
+      }
+      info.append(name, meta);
+
+      const dl = document.createElement('button');
+      dl.type = 'button';
+      dl.className = 'btn-small';
+      dl.textContent = '下载';
+      dl.addEventListener('click', () => downloadBlob(out.blob, sanitizeName(out.name)));
+
+      row.append(thumb, info, dl);
+      resultItems.appendChild(row);
     }
-
-    const row = document.createElement('div');
-    row.className = 'result-row';
-
-    const thumb = document.createElement('img');
-    thumb.className = 'result-thumb';
-    thumb.alt = out.name;
-    if (thumbUrl) thumb.src = thumbUrl;
-
-    const info = document.createElement('div');
-    info.className = 'result-info';
-    const name = document.createElement('div');
-    name.className = 'ri-name';
-    name.textContent = out.name;
-    name.title = out.name;
-    const meta = document.createElement('div');
-    meta.className = 'ri-meta';
-    const sizeText = formatBytes(out.blob.size);
-    let metaText = sizeText;
-    if (out.width && out.height) metaText = `${out.width}×${out.height} · ${sizeText}`;
-    meta.textContent = metaText;
-    if (typeof out.savedPercent === 'number') {
-      const save = document.createElement('span');
-      save.className = 'ri-save';
-      save.textContent = out.savedPercent >= 0 ? `节省 ${out.savedPercent}%` : `体积增大 ${-out.savedPercent}%`;
-      meta.appendChild(save);
-    }
-    info.append(name, meta);
-
-    const dl = document.createElement('button');
-    dl.type = 'button';
-    dl.className = 'btn-small';
-    dl.textContent = '下载';
-    dl.addEventListener('click', () => downloadBlob(out.blob, sanitizeName(out.name)));
-
-    row.append(thumb, info, dl);
-    resultItems.appendChild(row);
   }
 
   async function downloadZip(): Promise<void> {
-    const list = items.filter((it) => it.result).map((it) => it.result as ConvertOutput);
+    const list = items.flatMap((it) => it.results);
     if (list.length === 0) return;
     try {
       const zipName = `cunconvert-${new Date().toISOString().slice(0, 10)}.zip`;

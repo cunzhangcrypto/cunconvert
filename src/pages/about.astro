@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { canonicalUrl } from '../lib/utils/site';
 
-const site = Astro.site;
-const canonical = new URL('/about/', site ?? 'https://cunconvert.example.com/').href;
+const canonical = canonicalUrl('/about/');
 ---
 
 <BaseLayout
@@ -34,8 +34,13 @@ const canonical = new URL('/about/', site ?? 'https://cunconvert.example.com/').
       </p>
       <h2>联系我们</h2>
       <p>
-        如果你发现工具问题或有功能建议，欢迎到项目的 GitHub 仓库提交 Issue。
+        如果你发现工具问题或有功能建议，欢迎到项目的 GitHub 仓库提交 Issue，也可以直接联系村长：
       </p>
+      <ul class="contact-list">
+        <li>村长博客：<a href="https://cunzhangblog.com" target="_blank" rel="noopener">https://cunzhangblog.com</a></li>
+        <li>村长实验室：<a href="https://czlab.dev" target="_blank" rel="noopener">https://czlab.dev</a></li>
+        <li>联系村长：<a href="mailto:cunzhang@czlab.dev">cunzhang@czlab.dev</a></li>
+      </ul>
     </div>
   </div>
 </BaseLayout>

@@ -1,11 +1,16 @@
 ---
 import { toolCategories, toolsByCategory } from '../data/tools';
+import { toolIcons } from '../data/tool-icons';
 ---
 
 <header class="site-header">
   <div class="container header-inner">
     <a class="logo" href="/" aria-label="CunConvert 首页">
-      <span class="logo-mark">C</span>
+      <span class="logo-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4.5 11h15M8 7l-3.5 4L8 15M16 7l3.5 4-3.5 4"/>
+        </svg>
+      </span>
       <span>CunConvert</span>
       <span class="logo-tag">本地工具</span>
     </a>
@@ -17,7 +22,13 @@ import { toolCategories, toolsByCategory } from '../data/tools';
             <div class="drop-group">
               <div class="drop-title">{cat.icon} {cat.label}</div>
               {toolsByCategory(cat.key).map((t) => (
-                <a href={`/${t.slug}/`}><span>{t.name}</span><small>{t.short}</small></a>
+                <a href={`/${t.slug}/`}>
+                  <span class="dd-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={toolIcons[t.slug] ?? ''}></svg>
+                  </span>
+                  <span class="dd-label">{t.name}</span>
+                  <small>{t.short}</small>
+                </a>
               ))}
             </div>
           ))}

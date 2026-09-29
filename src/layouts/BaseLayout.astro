@@ -11,9 +11,27 @@ interface Props {
   jsonLd?: string[];
 }
 
-const { title, description, canonical, ogImage = '/favicon.svg', jsonLd = [] } = Astro.props;
-const site = Astro.site;
-const ogImageUrl = new URL(ogImage, site ?? canonical).href;
+const { title, description, canonical = '', ogImage = '/favicon.svg', jsonLd = [] } = Astro.props;
+let ogImageUrl = '';
+if (canonical) {
+  try {
+    ogImageUrl = new URL(ogImage, canonical).href;
+  } catch {
+    ogImageUrl = ogImage;
+  }
+}
+// 全站 Organization schema（站点主体信息，利于搜索与 AI 引擎识别）
+const orgLd = canonical
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: 'CunConvert',
+      url: canonical,
+      logo: ogImageUrl,
+      description: '本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。所有文件在浏览器本地处理，不会上传服务器。',
+    })
+  : '';
+const allLd = orgLd ? [...jsonLd, orgLd] : jsonLd;
 ---
 
 <!doctype html>
@@ -23,18 +41,18 @@ const ogImageUrl = new URL(ogImage, site ?? canonical).href;
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
+    {canonical && <link rel="canonical" href={canonical} />}
     <meta name="robots" content="index, follow" />
-    <meta name="theme-color" content="#3b6ef6" />
+    <meta name="theme-color" content="#00d4a4" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImageUrl} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
+    {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>
       (function () {
@@ -47,11 +65,61 @@ const ogImageUrl = new URL(ogImage, site ?? canonical).href;
         }
       })();
     </script>
-    {jsonLd.map((ld) => <script type="application/ld+json" set:html={ld} />)}
+    {allLd.map((ld) => <script type="application/ld+json" set:html={ld} />)}
   </head>
   <body>
+    <!-- 全站背景动效：抽象"图像处理场"（fixed，不随滚动） -->
+    <div class="site-bg" aria-hidden="true">
+      <svg class="hb-band hb-t" viewBox="0 0 1140 240" preserveAspectRatio="none" fill="none">
+        <defs>
+          <linearGradient id="ccbandt" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#00d4a4" stop-opacity="0"/>
+            <stop offset="0.5" stop-color="#00d4a4" stop-opacity="0.75"/>
+            <stop offset="1" stop-color="#3ec3f0" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 40 90 Q 570 330 1100 90" stroke="url(#ccbandt)" stroke-width="64" stroke-linecap="round" opacity="0.22"/>
+      </svg>
+      <svg class="hb-band hb-b" viewBox="0 0 1140 240" preserveAspectRatio="none" fill="none">
+        <defs>
+          <linearGradient id="ccbandb" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#3ec3f0" stop-opacity="0"/>
+            <stop offset="0.5" stop-color="#00d4a4" stop-opacity="0.7"/>
+            <stop offset="1" stop-color="#00d4a4" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 40 150 Q 570 -90 1100 150" stroke="url(#ccbandb)" stroke-width="64" stroke-linecap="round" opacity="0.22"/>
+      </svg>
+      <svg class="hb-arc hb-al" viewBox="0 0 420 620" fill="none">
+        <defs>
+          <linearGradient id="ccbandl" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#00d4a4" stop-opacity="0"/>
+            <stop offset="0.5" stop-color="#3ec3f0" stop-opacity="0.8"/>
+            <stop offset="1" stop-color="#00d4a4" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 80 470 A 200 260 0 0 0 360 90" stroke="url(#ccbandl)" stroke-width="40" stroke-linecap="round" opacity="0.18"/>
+      </svg>
+      <svg class="hb-arc hb-ar" viewBox="0 0 420 620" fill="none">
+        <defs>
+          <linearGradient id="ccbandr" x1="1" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#00d4a4" stop-opacity="0"/>
+            <stop offset="0.5" stop-color="#3ec3f0" stop-opacity="0.8"/>
+            <stop offset="1" stop-color="#00d4a4" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path d="M 340 470 A 200 260 0 0 1 60 90" stroke="url(#ccbandr)" stroke-width="40" stroke-linecap="round" opacity="0.18"/>
+      </svg>
+      <div class="hb-scan"></div>
+      <div class="hb-slice hb-s1"></div>
+      <div class="hb-slice hb-s2"></div>
+      <div class="hb-slice hb-s3"></div>
+      <div class="hb-slice hb-s4"></div>
+      <div class="hb-grid hb-gl"></div>
+      <div class="hb-grid hb-gr"></div>
+    </div>
     <Header />
-    <main><slot /></main>
+    <main class="site-main"><slot /></main>
     <Footer />
   </body>
 </html>

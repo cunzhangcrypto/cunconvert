@@ -1,0 +1,21 @@
+---
+import type { ToolMeta } from '../data/tools';
+import { toolIcons } from '../data/tool-icons';
+
+interface Props {
+  tool: ToolMeta;
+}
+
+const { tool } = Astro.props;
+
+const icon = toolIcons[tool.slug] ?? '';
+---
+
+<a class="tool-card" href={`/${tool.slug}/`}>
+  <span class="tc-icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" set:html={icon}></svg>
+  </span>
+  <span class="tc-name">{tool.name}</span>
+  <span class="tc-desc">{tool.short}</span>
+  <span class="tc-arrow" aria-hidden="true">→</span>
+</a>

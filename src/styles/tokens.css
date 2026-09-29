@@ -1,26 +1,29 @@
-/* CunConvert 设计变量：亮色为主，支持深色/跟随系统 */
+/* CunConvert 设计变量：色板完全参考 Mintlify（薄荷绿品牌色 + 中性灰阶），亮色为主，支持深色/跟随系统 */
 :root {
-  --bg: #ffffff;
-  --bg-soft: #f6f7f9;
-  --bg-tint: #eef2f7;
-  --card: #ffffff;
-  --text: #1a2233;
-  --text-soft: #55627a;
-  --text-faint: #8a94a8;
-  --border: #e3e7ee;
-  --border-strong: #cfd6e0;
-  --accent: #3b6ef6;
-  --accent-strong: #2a5be0;
-  --accent-soft: #e8efff;
-  --accent-text: #ffffff;
-  --ok: #1e9e5a;
-  --ok-soft: #e5f6ec;
-  --warn: #e08a00;
+  --bg: #ffffff;                 /* canvas */
+  --bg-soft: #f7f7f7;            /* surface */
+  --bg-tint: #f5f5f5;
+  --card: #ffffff;               /* canvas */
+  --text: #0a0a0a;               /* ink */
+  --text-soft: #5a5a5c;          /* steel */
+  --text-faint: #888888;         /* stone */
+  --border: #e5e5e5;             /* hairline */
+  --border-strong: #d4d4d6;
+  --accent: #00d4a4;             /* brand-green */
+  --accent-strong: #00b48a;      /* brand-green-deep */
+  --accent-soft: #dcfaf2;        /* 薄荷绿浅底 */
+  --accent-text: #0a0a0a;        /* on brand-green 用 ink 黑字 */
+  --ok: #1ba673;                 /* brand-annotate */
+  --ok-soft: #e2f7f0;
+  --warn: #c37d0d;               /* brand-warn */
   --warn-soft: #fdf3e0;
-  --danger: #d64545;
+  --danger: #d45656;             /* brand-error */
   --danger-soft: #fdeaea;
-  --shadow-sm: 0 1px 2px rgba(23, 34, 56, 0.05), 0 1px 3px rgba(23, 34, 56, 0.06);
-  --shadow-md: 0 6px 24px rgba(23, 34, 56, 0.08);
+  --cta-bg: #0a0a0a;
+  --cta-text: #ffffff;
+  --cta-hover: #26272b;
+  --shadow-sm: 0 1px 2px rgba(10, 10, 10, 0.04), 0 1px 3px rgba(10, 10, 10, 0.05);
+  --shadow-md: 0 6px 24px rgba(10, 10, 10, 0.08);
   --radius: 12px;
   --radius-lg: 16px;
   --radius-sm: 8px;
@@ -29,25 +32,28 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0f1520;
-  --bg-soft: #161e2c;
-  --bg-tint: #1b2535;
-  --card: #182130;
-  --text: #e6eaf2;
-  --text-soft: #a9b4c6;
-  --text-faint: #6f7b90;
-  --border: #2a3547;
-  --border-strong: #3a4659;
-  --accent: #5b84f8;
-  --accent-strong: #7b9dfa;
-  --accent-soft: #223354;
-  --accent-text: #ffffff;
+  --bg: #0a0a0a;                 /* canvas-dark */
+  --bg-soft: #1c1c1e;            /* charcoal */
+  --bg-tint: #26262a;
+  --card: #151517;
+  --text: #ffffff;               /* on-dark */
+  --text-soft: #b3b3b3;          /* on-dark-muted */
+  --text-faint: #888888;
+  --border: #1f1f1f;             /* hairline-dark */
+  --border-strong: #3a3a3c;
+  --accent: #00e0ae;
+  --accent-strong: #7cebcb;      /* brand-green-soft */
+  --accent-soft: #0d2a24;
+  --accent-text: #0a0a0a;
   --ok: #3ecf7c;
   --ok-soft: #16301f;
-  --warn: #f0a83c;
+  --warn: #e3a13c;
   --warn-soft: #382a12;
-  --danger: #f06666;
+  --danger: #e06666;
   --danger-soft: #3a1a1a;
+  --cta-bg: #ffffff;
+  --cta-text: #0a0a0a;
+  --cta-hover: #c9c9cb;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.45);
 }

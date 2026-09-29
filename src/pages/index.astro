@@ -1,50 +1,75 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import ToolCard from '../components/ToolCard.astro';
 import { toolCategories, toolsByCategory } from '../data/tools';
+import { canonicalUrl } from '../lib/utils/site';
 
-const site = Astro.site;
-const canonical = new URL('/', site ?? 'https://cunconvert.example.com/').href;
+const canonical = canonicalUrl('/');
 const jsonLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'WebSite',
   name: 'CunConvert',
-  url: canonical,
+  url: canonical || undefined,
   description: '本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。文件均在浏览器本地处理，不会上传。',
   inLanguage: 'zh-CN',
 });
 ---
 
 <BaseLayout
-  title="CunConvert - 本地图片与 SVG 工具箱（文件不上传）"
+  title="CunConvert - 本地图片与 SVG 工具箱"
   description="免费在线图片与 SVG 工具箱：SVG 转 PNG/JPG/WebP、PNG/JPG/WebP 互转、图片压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与图片矢量化。所有文件在浏览器本地处理，不会上传服务器。"
   canonical={canonical}
   jsonLd={[jsonLd]}
 >
   <div class="container">
     <section class="hero">
-      <span class="hero-badge">🔒 文件不上传 · 全部在浏览器本地处理</span>
-      <h1>本地图片与 SVG 工具箱</h1>
+      <div class="hero-content">
+        <span class="hero-appicon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4.5 11h15M8 7l-3.5 4L8 15M16 7l3.5 4-3.5 4"/>
+          </svg>
+        </span>
+        <span class="hero-badge">🔒 文件不上传 · 全部在浏览器本地处理</span>
+      <h1>
+        <span class="hero-brand">CunConvert</span>
+        <span class="hero-dash">——</span>
+        <span class="hero-tagline">本地图片处理工作台</span>
+      </h1>
       <p class="hero-sub">格式转换 · 压缩 · 调整尺寸 · 裁剪 · SVG 优化与矢量化</p>
-      <p class="hero-trust">无需注册，无需上传。你的文件永远不会离开设备。</p>
+      <div class="hero-features">
+        <span class="hf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>
+          本地处理
+        </span>
+        <span class="hf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M8.5 12l2.5 2.5 4.5-4.5"/></svg>
+          无需上传
+        </span>
+        <span class="hf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="9" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+          隐私安全
+        </span>
+      </div>
+      <a class="hero-cta" href="#tools">开始使用</a>
+      <p class="hero-trust">无需注册，你的文件永远不会离开设备</p>
+      </div>
     </section>
 
-    {
-      toolCategories.map((cat) => (
-        <section class="tool-grid-section">
-          <h2>
-            <span class="sec-icon">{cat.icon}</span>
-            {cat.label}
-          </h2>
-          <div class="tool-grid">
-            {toolsByCategory(cat.key).map((t) => (
-              <a class="tool-card" href={`/${t.slug}/`}>
-                <div class="tc-name">{t.name}</div>
-                <div class="tc-desc">{t.short}</div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ))
-    }
+    <div id="tools">
+      {
+        toolCategories.map((cat) => (
+          <section class="tool-grid-section">
+            <h2>
+              <span class="sec-icon">{cat.icon}</span>
+              <span class="sec-title">{cat.label}</span>
+              <span class="sec-count">{toolsByCategory(cat.key).length} 个工具</span>
+            </h2>
+            <div class="tool-grid">
+              {toolsByCategory(cat.key).map((t) => <ToolCard tool={t} />)}
+            </div>
+          </section>
+        ))
+      }
+    </div>
   </div>
 </BaseLayout>

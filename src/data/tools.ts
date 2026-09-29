@@ -209,6 +209,19 @@ export const tools: ToolMeta[] = [
     related: ['image-resizer', 'image-rotate-flip', 'image-compressor', 'webp-to-png', 'jpg-to-png'],
   },
   {
+    slug: 'remove-background',
+    name: '去除图片背景',
+    short: '移除纯色背景（白底、绿幕等），一键变为透明 PNG',
+    title: '在线去除图片背景 - 免费去白底变透明 PNG | CunConvert',
+    description:
+      '在线去除图片背景。无需上传文件，浏览器本地完成，支持白底、绿幕等纯色背景移除，可调节容差与边缘羽化，输出透明 PNG。',
+    h1: '去除图片背景',
+    intro: '选择要去除的背景颜色，将与之接近的像素变为透明，得到透明底 PNG。适合白底证件照、绿幕素材与纯色背景的商品图。',
+    accept: '.jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp',
+    category: 'image',
+    related: ['image-cropper', 'png-to-svg', 'image-resizer', 'webp-to-png', 'jpg-to-png'],
+  },
+  {
     slug: 'image-rotate-flip',
     name: '旋转与翻转',
     short: '旋转图片 90°/180°/270°，水平或垂直翻转',

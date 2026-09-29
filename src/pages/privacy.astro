@@ -1,8 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { canonicalUrl } from '../lib/utils/site';
 
-const site = Astro.site;
-const canonical = new URL('/privacy/', site ?? 'https://cunconvert.example.com/').href;
+const canonical = canonicalUrl('/privacy/');
 ---
 
 <BaseLayout

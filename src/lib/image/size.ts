@@ -20,17 +20,16 @@ export function computeTargetSize(
     h = Math.round(srcH * opts.scale);
   }
 
-  if (opts.width && opts.width > 0) {
-    if (opts.height && opts.height > 0 && !opts.lockRatio) {
-      w = opts.width;
-      h = opts.height;
-    } else {
-      w = opts.width;
-      h = Math.max(1, Math.round(opts.width * (srcH / srcW)));
-    }
+  if (opts.width && opts.width > 0 && opts.height && opts.height > 0) {
+    // 同时指定宽高：以用户输入为准（锁定比例不再覆盖显式输入）
+    w = opts.width;
+    h = opts.height;
+  } else if (opts.width && opts.width > 0) {
+    w = opts.width;
+    if (opts.lockRatio !== false) h = Math.max(1, Math.round(opts.width * (srcH / srcW)));
   } else if (opts.height && opts.height > 0) {
     h = opts.height;
-    w = Math.max(1, Math.round(opts.height * (srcW / srcH)));
+    if (opts.lockRatio !== false) w = Math.max(1, Math.round(opts.height * (srcW / srcH)));
   }
 
   if (w < 1) w = 1;
