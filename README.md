@@ -124,7 +124,7 @@ npx wrangler pages deploy dist --project-name cunconvert
 
 | 微信 | 支付宝 | USDT（BEP20） | USDT（TRC20） |
 |---|---|---|---|
-| <img src="/donate/wechat.png" width="160" alt="微信收款码" /> | <img src="/donate/alipay.png" width="160" alt="支付宝收款码" /> | <img src="/donate/usdtbep20.png" width="160" alt="USDT BEP20 收款码" /> | <img src="/donate/usdttrc20.png" width="160" alt="USDT TRC20 收款码" /> |
+| <img src="public/donate/wechat.png" width="160" alt="微信收款码" /> | <img src="public/donate/alipay.png" width="160" alt="支付宝收款码" /> | <img src="public/donate/usdtbep20.png" width="160" alt="USDT BEP20 收款码" /> | <img src="public/donate/usdttrc20.png" width="160" alt="USDT TRC20 收款码" /> |
 
 ## 🕊️ 隐私声明
 
