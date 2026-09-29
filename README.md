@@ -118,11 +118,25 @@ npx wrangler pages deploy dist --project-name cunconvert
 
 > 注意：`public/vendor/imagetracer_v1.2.6.js` 会随构建产物自动包含在 `dist/` 中，无需额外配置。请勿将其改为外部 CDN 引用。
 
+## ☕ 打赏支持
+
+如果 CunConvert 帮到了你，欢迎请村长喝杯咖啡～你的支持是持续更新的动力。
+
+| 微信 | 支付宝 | USDT（BEP20） | USDT（TRC20） |
+|---|---|---|---|
+| <img src="/donate/wechat.png" width="160" alt="微信收款码" /> | <img src="/donate/alipay.png" width="160" alt="支付宝收款码" /> | <img src="/donate/usdtbep20.png" width="160" alt="USDT BEP20 收款码" /> | <img src="/donate/usdttrc20.png" width="160" alt="USDT TRC20 收款码" /> |
+
 ## 🕊️ 隐私声明
 
 - 所有图片与 SVG 文件**只在浏览器本地处理**，项目源码中不存在任何 `fetch` / `XHR` / 上传逻辑。
 - 不使用任何后端、数据库、第三方 AI API 或分析追踪。
 - 生成的图片、ZIP 等文件仅保存在你自己的设备中。
+
+## 📮 联系方式
+
+- **村长博客**：https://cunzhangblog.com
+- **村长实验室**：https://czlab.dev
+- **联系村长**：cunzhang@czlab.dev
 
 ## 📄 许可证
 
