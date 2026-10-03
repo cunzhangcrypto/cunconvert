@@ -19,7 +19,7 @@ export function mount(root: HTMLElement): void {
   const browse = root.querySelector<HTMLElement>('[data-browse]');
   const metaLine = root.querySelector<HTMLElement>('[data-pdf-meta]');
   const panel = root.querySelector<HTMLElement>('[data-p2i-panel]');
-  const grid = root.querySelector<HTMLElement>('[data-page-grid]');
+  const grid = root.querySelector<HTMLElement>('[data-page-grid]')!;
   const selCount = root.querySelector<HTMLElement>('[data-sel-count]');
   const selectAll = root.querySelector<HTMLButtonElement>('[data-select-all]');
   const selectNone = root.querySelector<HTMLButtonElement>('[data-select-none]');

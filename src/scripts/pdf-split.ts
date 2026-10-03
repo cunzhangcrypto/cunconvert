@@ -15,7 +15,7 @@ export function mount(root: HTMLElement): void {
   const dropzone = root.querySelector<HTMLElement>('[data-dropzone]');
   const metaLine = root.querySelector<HTMLElement>('[data-pdf-meta]');
   const panel = root.querySelector<HTMLElement>('[data-split-panel]');
-  const grid = root.querySelector<HTMLElement>('[data-page-grid]');
+  const grid = root.querySelector<HTMLElement>('[data-page-grid]')!;
   const selectTools = root.querySelector<HTMLElement>('[data-select-tools]');
   const chunkBlock = root.querySelector<HTMLElement>('[data-chunk-block]');
   const selCount = root.querySelector<HTMLElement>('[data-sel-count]');

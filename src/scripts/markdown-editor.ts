@@ -37,7 +37,7 @@ const MODES: MdMode[] = ['edit', 'import'];
  * 2) 文章 / HTML 转 Markdown —— 粘贴富文本或 HTML 源码，本地转成 Markdown。
  */
 export function mount(root: HTMLElement): void {
-  const input = root.querySelector<HTMLTextAreaElement>('[data-md-input]');
+  const input = root.querySelector<HTMLTextAreaElement>('[data-md-input]')!;
   const preview = root.querySelector<HTMLElement>('[data-md-preview]');
   const status = root.querySelector<HTMLElement>('[data-md-status]');
   const notice = root.querySelector<HTMLElement>('[data-notice]');

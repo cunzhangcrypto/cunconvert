@@ -18,7 +18,7 @@ export function mount(root: HTMLElement): void {
   const dropzone = root.querySelector<HTMLElement>('[data-dropzone]');
   const metaLine = root.querySelector<HTMLElement>('[data-pdf-meta]');
   const panel = root.querySelector<HTMLElement>('[data-org-panel]');
-  const list = root.querySelector<HTMLElement>('[data-org-list]');
+  const list = root.querySelector<HTMLElement>('[data-org-list]')!;
   const countLine = root.querySelector<HTMLElement>('[data-org-count]');
   const runBtn = root.querySelector<HTMLButtonElement>('[data-org-run]');
   const resetBtn = root.querySelector<HTMLButtonElement>('[data-org-reset]');
