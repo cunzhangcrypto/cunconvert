@@ -18,13 +18,28 @@ export interface ConvertToolOptions {
    * 转换单文件（可返回多张结果，如平台预设一次输出多个规格）。
    * 抛出的异常会被转为中文提示。
    */
-  convert(file: File, params: Params, info: { index: number; total: number }): Promise<ConvertOutput | ConvertOutput[]>;
+  convert?(
+    file: File,
+    params: Params,
+    info: { index: number; total: number },
+  ): Promise<ConvertOutput | ConvertOutput[]>;
+  /**
+   * 合并模式：把全部文件当作一个整体处理，只输出一次结果
+   * （如「多张图片合成一个 PDF」「多个 PDF 合并」）。提供后优先于 convert。
+   */
+  convertAll?(
+    files: File[],
+    params: Params,
+    onProgress?: (done: number, total: number) => void,
+  ): Promise<ConvertOutput | ConvertOutput[]>;
   /** 自定义参数读取（如裁剪工具需要读取画布选区） */
   getParams?(scope: HTMLElement): Params;
   /** 文件加入列表后的回调（如裁剪工具需要加载首张图到画布） */
   onFiles?(files: File[], scope: HTMLElement): void;
   /** 结果缩略图 URL，默认 objectURL */
   preview?(blob: Blob): string | Promise<string>;
+  /** 文件列表可拖拽排序（图片转 PDF、PDF 合并等需要按顺序输出的工具） */
+  sortable?: boolean;
 }
 
 interface FileItem {
@@ -62,6 +77,8 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
   const items: FileItem[] = [];
   const urls: string[] = [];
   let busy = false;
+  /** 合并模式（convertAll）的输出结果 */
+  let mergedResults: ConvertOutput[] = [];
 
   const collectParams = (): Params => (opts.getParams ? opts.getParams(scope) : readParams(scope));
 
@@ -167,13 +184,83 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
       const i = items.findIndex((it) => it.row === row);
       if (i >= 0) items.splice(i, 1);
       row.remove();
+      updateMoveButtons();
       syncConvertState();
     });
 
-    row.append(img, info, status, del);
-    fileList?.appendChild(row);
+    const item: FileItem = { file, row, thumb: img, status, results: [] };
 
-    items.push({ file, row, thumb: img, status, results: [] });
+    if (opts.sortable) {
+      row.classList.add('sortable');
+      row.draggable = true;
+      const move = document.createElement('div');
+      move.className = 'file-move';
+      const up = document.createElement('button');
+      up.type = 'button';
+      up.dataset.move = 'up';
+      up.textContent = '↑';
+      up.setAttribute('aria-label', '上移');
+      up.addEventListener('click', () => moveItem(items.indexOf(item), items.indexOf(item) - 1));
+      const down = document.createElement('button');
+      down.type = 'button';
+      down.dataset.move = 'down';
+      down.textContent = '↓';
+      down.setAttribute('aria-label', '下移');
+      down.addEventListener('click', () => moveItem(items.indexOf(item), items.indexOf(item) + 1));
+      move.append(up, down);
+      row.append(img, info, status, move, del);
+      row.addEventListener('dragstart', (e) => {
+        dragIndex = items.indexOf(item);
+        row.classList.add('dragging');
+        e.dataTransfer?.setData('text/plain', String(dragIndex));
+      });
+      row.addEventListener('dragend', () => {
+        row.classList.remove('dragging');
+        dragIndex = -1;
+      });
+      row.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        row.classList.add('drag-over');
+      });
+      row.addEventListener('dragleave', () => row.classList.remove('drag-over'));
+      row.addEventListener('drop', (e) => {
+        e.preventDefault();
+        row.classList.remove('drag-over');
+        moveItem(dragIndex, items.indexOf(item));
+      });
+    } else {
+      row.append(img, info, status, del);
+    }
+
+    fileList?.appendChild(row);
+    items.push(item);
+    updateMoveButtons();
+  }
+
+  // ---- 文件排序（opts.sortable）----
+  let dragIndex = -1;
+
+  function applyOrder(): void {
+    if (!fileList) return;
+    for (const it of items) fileList.appendChild(it.row);
+    updateMoveButtons();
+  }
+
+  function updateMoveButtons(): void {
+    if (!opts.sortable) return;
+    items.forEach((it, i) => {
+      const up = it.row.querySelector<HTMLButtonElement>('[data-move="up"]');
+      const down = it.row.querySelector<HTMLButtonElement>('[data-move="down"]');
+      if (up) up.disabled = i === 0;
+      if (down) down.disabled = i === items.length - 1;
+    });
+  }
+
+  function moveItem(from: number, to: number): void {
+    if (from === to || from < 0 || to < 0 || from >= items.length || to >= items.length) return;
+    const [it] = items.splice(from, 1);
+    items.splice(to, 0, it);
+    applyOrder();
   }
 
   function syncConvertState(): void {
@@ -202,112 +289,149 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     let firstError = '';
 
     try {
-      await runBatch(
-        items,
-        async (item, i) => {
-          setStatus(item, '处理中…', 'processing');
-          if (progress) progress.hidden = false;
-          if (progressText) progressText.textContent = `正在处理 ${i + 1} / ${items.length}`;
-          if (progressBar) progressBar.style.width = `${(i / items.length) * 100}%`;
-          try {
-            const out = await opts.convert(item.file, params, { index: i, total: items.length });
-            item.results = Array.isArray(out) ? out : [out];
-            setStatus(item, item.results.length > 1 ? `已完成 ${item.results.length} 张` : '已完成', 'done');
-            renderResult(item);
-          } catch (e) {
-            item.results = [];
-            setStatus(item, '失败', 'failed');
-            if (!firstError) firstError = toUserMessage(e);
-          }
-        },
-        {
-          onProgress: (done, total) => {
+      if (opts.convertAll) {
+        // ---- 合并模式：全部文件 → 一次输出 ----
+        for (const it of items) setStatus(it, '处理中…', 'processing');
+        if (progress) progress.hidden = false;
+        if (progressText) progressText.textContent = `正在处理 ${items.length} 个文件`;
+        if (progressBar) progressBar.style.width = '8%';
+        try {
+          const out = await opts.convertAll(items.map((it) => it.file), params, (done, total) => {
             if (progressText) progressText.textContent = `正在处理 ${done} / ${total}`;
-            if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
+            if (progressBar) progressBar.style.width = `${Math.round((done / total) * 100)}%`;
+          });
+          mergedResults = Array.isArray(out) ? out : [out];
+          for (const it of items) setStatus(it, '已合并', 'done');
+          for (const o of mergedResults) await renderOutput(o);
+          if (progressText) progressText.textContent = '处理完成';
+          if (progressBar) progressBar.style.width = '100%';
+          if (progress) setTimeout(() => { progress.hidden = true; }, 1600);
+          if (results) results.hidden = false;
+          if (zipBtn) zipBtn.disabled = false;
+          showDoneModal('处理完成', `已生成 ${mergedResults.length} 个文件，可点击下载`);
+        } catch (e) {
+          for (const it of items) setStatus(it, '失败', 'failed');
+          if (progress) progress.hidden = true;
+          firstError = toUserMessage(e);
+        }
+      } else if (opts.convert) {
+        // ---- 逐文件模式 ----
+        const convert = opts.convert;
+        await runBatch(
+          items,
+          async (item, i) => {
+            setStatus(item, '处理中…', 'processing');
+            if (progress) progress.hidden = false;
+            if (progressText) progressText.textContent = `正在处理 ${i + 1} / ${items.length}`;
+            if (progressBar) progressBar.style.width = `${(i / items.length) * 100}%`;
+            try {
+              const out = await convert(item.file, params, { index: i, total: items.length });
+              item.results = Array.isArray(out) ? out : [out];
+              setStatus(item, item.results.length > 1 ? `已完成 ${item.results.length} 张` : '已完成', 'done');
+              for (const o of item.results) await renderOutput(o);
+            } catch (e) {
+              item.results = [];
+              setStatus(item, '失败', 'failed');
+              if (!firstError) firstError = toUserMessage(e);
+            }
           },
-        },
-      );
-
-      const doneCount = items.filter((it) => it.results.length > 0).length;
-      const failCount = items.length - doneCount;
-      if (doneCount > 0) {
-        if (progressText) progressText.textContent = failCount === 0 ? '转换完成' : `转换完成，${failCount} 个失败`;
-        if (progressBar) progressBar.style.width = '100%';
-        if (progress) setTimeout(() => { progress.hidden = true; }, 1600);
-      } else {
-        if (progress) progress.hidden = true;
-      }
-      if (doneCount > 0) {
-        if (results) results.hidden = false;
-        if (zipBtn) zipBtn.disabled = false;
-        showDoneModal(
-          failCount === 0 ? '处理完成' : '处理完成（部分失败）',
-          failCount === 0 ? `成功转换 ${doneCount} 个文件，可点击下载` : `成功 ${doneCount} 个，失败 ${failCount} 个`,
+          {
+            onProgress: (done, total) => {
+              if (progressText) progressText.textContent = `正在处理 ${done} / ${total}`;
+              if (progressBar) progressBar.style.width = `${(done / total) * 100}%`;
+            },
+          },
         );
+
+        const doneCount = items.filter((it) => it.results.length > 0).length;
+        const failCount = items.length - doneCount;
+        if (doneCount > 0) {
+          if (progressText) progressText.textContent = failCount === 0 ? '转换完成' : `转换完成，${failCount} 个失败`;
+          if (progressBar) progressBar.style.width = '100%';
+          if (progress) setTimeout(() => { progress.hidden = true; }, 1600);
+        } else {
+          if (progress) progress.hidden = true;
+        }
+        if (doneCount > 0) {
+          if (results) results.hidden = false;
+          if (zipBtn) zipBtn.disabled = false;
+          showDoneModal(
+            failCount === 0 ? '处理完成' : '处理完成（部分失败）',
+            failCount === 0 ? `成功转换 ${doneCount} 个文件，可点击下载` : `成功 ${doneCount} 个，失败 ${failCount} 个`,
+          );
+        }
+        if (doneCount === 0 && !firstError) {
+          showNotice('没有文件处理成功，请检查文件格式后重试', 'warn');
+        }
       }
+
       if (firstError) showNotice(firstError);
-      if (doneCount === 0 && !firstError) {
-        showNotice('没有文件处理成功，请检查文件格式后重试', 'warn');
-      }
     } finally {
       busy = false;
       syncConvertState();
     }
   }
 
-  async function renderResult(item: FileItem): Promise<void> {
-    for (const out of item.results) {
-      if (!resultItems) return;
+  async function renderOutput(out: ConvertOutput): Promise<void> {
+    if (!resultItems) return;
 
-      let thumbUrl = '';
-      try {
-        thumbUrl = opts.preview ? await opts.preview(out.blob) : URL.createObjectURL(out.blob);
-        if (thumbUrl) urls.push(thumbUrl);
-      } catch {
-        thumbUrl = '';
-      }
+    let thumbUrl = '';
+    try {
+      thumbUrl = opts.preview ? await opts.preview(out.blob) : URL.createObjectURL(out.blob);
+      if (thumbUrl) urls.push(thumbUrl);
+    } catch {
+      thumbUrl = '';
+    }
 
-      const row = document.createElement('div');
-      row.className = 'result-row';
+    const row = document.createElement('div');
+    row.className = 'result-row';
 
+    let thumbEl: HTMLElement;
+    if (thumbUrl) {
       const thumb = document.createElement('img');
       thumb.className = 'result-thumb';
       thumb.alt = out.name;
-      if (thumbUrl) thumb.src = thumbUrl;
-
-      const info = document.createElement('div');
-      info.className = 'result-info';
-      const name = document.createElement('div');
-      name.className = 'ri-name';
-      name.textContent = out.name;
-      name.title = out.name;
-      const meta = document.createElement('div');
-      meta.className = 'ri-meta';
-      const sizeText = formatBytes(out.blob.size);
-      let metaText = sizeText;
-      if (out.width && out.height) metaText = `${out.width}×${out.height} · ${sizeText}`;
-      meta.textContent = metaText;
-      if (typeof out.savedPercent === 'number') {
-        const save = document.createElement('span');
-        save.className = 'ri-save';
-        save.textContent = out.savedPercent >= 0 ? `节省 ${out.savedPercent}%` : `体积增大 ${-out.savedPercent}%`;
-        meta.appendChild(save);
-      }
-      info.append(name, meta);
-
-      const dl = document.createElement('button');
-      dl.type = 'button';
-      dl.className = 'btn-small';
-      dl.textContent = '下载';
-      dl.addEventListener('click', () => downloadBlob(out.blob, sanitizeName(out.name)));
-
-      row.append(thumb, info, dl);
-      resultItems.appendChild(row);
+      thumb.src = thumbUrl;
+      thumbEl = thumb;
+    } else {
+      const ph = document.createElement('span');
+      ph.className = 'result-thumb result-thumb-ph';
+      ph.textContent = (out.name.split('.').pop() ?? '').toUpperCase().slice(0, 4);
+      thumbEl = ph;
     }
+
+    const info = document.createElement('div');
+    info.className = 'result-info';
+    const name = document.createElement('div');
+    name.className = 'ri-name';
+    name.textContent = out.name;
+    name.title = out.name;
+    const meta = document.createElement('div');
+    meta.className = 'ri-meta';
+    const sizeText = formatBytes(out.blob.size);
+    let metaText = sizeText;
+    if (out.width && out.height) metaText = `${out.width}×${out.height} · ${sizeText}`;
+    meta.textContent = metaText;
+    if (typeof out.savedPercent === 'number') {
+      const save = document.createElement('span');
+      save.className = 'ri-save';
+      save.textContent = out.savedPercent >= 0 ? `节省 ${out.savedPercent}%` : `体积增大 ${-out.savedPercent}%`;
+      meta.appendChild(save);
+    }
+    info.append(name, meta);
+
+    const dl = document.createElement('button');
+    dl.type = 'button';
+    dl.className = 'btn-small';
+    dl.textContent = '下载';
+    dl.addEventListener('click', () => downloadBlob(out.blob, sanitizeName(out.name)));
+
+    row.append(thumbEl, info, dl);
+    resultItems.appendChild(row);
   }
 
   async function downloadZip(): Promise<void> {
-    const list = items.flatMap((it) => it.results);
+    const list = mergedResults.length > 0 ? mergedResults : items.flatMap((it) => it.results);
     if (list.length === 0) return;
     try {
       const zipName = `cunconvert-${new Date().toISOString().slice(0, 10)}.zip`;
@@ -320,6 +444,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
 
   function clearAll(): void {
     items.length = 0;
+    mergedResults = [];
     if (fileList) fileList.innerHTML = '';
     if (resultItems) resultItems.innerHTML = '';
     if (results) results.hidden = true;

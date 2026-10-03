@@ -1,4 +1,12 @@
-export type ToolCategory = 'svg' | 'convert' | 'image' | 'vector';
+export type ToolCategory =
+  | 'svg'
+  | 'convert'
+  | 'image'
+  | 'vector'
+  | 'pdf'
+  | 'qr'
+  | 'favicon'
+  | 'markdown';
 
 export interface ToolMeta {
   slug: string;
@@ -18,6 +26,10 @@ export const toolCategories: { key: ToolCategory; label: string; icon: string }[
   { key: 'convert', label: '图片转换', icon: '⇄' },
   { key: 'image', label: '图片处理', icon: '✂' },
   { key: 'vector', label: '图片矢量化', icon: '◈' },
+  { key: 'pdf', label: 'PDF 工具', icon: '▤' },
+  { key: 'qr', label: '二维码', icon: '▩' },
+  { key: 'favicon', label: 'Favicon', icon: '◎' },
+  { key: 'markdown', label: 'Markdown', icon: '✎' },
 ];
 
 export const tools: ToolMeta[] = [
@@ -274,6 +286,126 @@ export const tools: ToolMeta[] = [
     accept: '.webp,image/webp',
     category: 'vector',
     related: ['png-to-svg', 'jpg-to-svg', 'svg-optimizer', 'svg-viewer', 'svg-to-png'],
+  },
+
+  // ===== PDF 工具 =====
+  {
+    slug: 'image-to-pdf',
+    name: '图片 → PDF',
+    short: '将多张 PNG / JPG / WebP 图片合并为一个多页 PDF',
+    title: '图片转 PDF - 在线免费多图合并 PDF 工具 | CunConvert',
+    description:
+      '在线将多张图片合并为一个 PDF。无需上传文件，浏览器本地完成，支持 PNG、JPG、WebP，可调整图片顺序、页面方向、页面尺寸与边距。',
+    h1: '图片转 PDF',
+    intro:
+      '把多张图片合并成一个多页 PDF。可以拖拽调整顺序、选择 A4 或原图尺寸、设置横向或纵向与页面边距，所有处理都在你的浏览器本地完成。',
+    accept: '.png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml',
+    category: 'pdf',
+    related: ['pdf-to-image', 'pdf-merge', 'pdf-split', 'pdf-organize'],
+  },
+  {
+    slug: 'pdf-to-image',
+    name: 'PDF → 图片',
+    short: '将 PDF 每一页导出为 PNG / JPG / WebP 图片',
+    title: 'PDF 转图片 - 在线免费 PDF 转 PNG / JPG 工具 | CunConvert',
+    description:
+      '在线将 PDF 每一页转换为图片。无需上传文件，浏览器本地完成，支持 PNG、JPG、WebP 输出，可选择指定页面、调节分辨率与质量并批量下载。',
+    h1: 'PDF 转图片',
+    intro:
+      '把 PDF 的每一页渲染成图片。支持选择全部页面或指定页面，输出 PNG / JPG / WebP，可调节清晰度与质量，并一键打包下载。',
+    accept: '.pdf,application/pdf',
+    category: 'pdf',
+    related: ['image-to-pdf', 'pdf-merge', 'pdf-split', 'pdf-organize'],
+  },
+  {
+    slug: 'pdf-merge',
+    name: 'PDF 合并',
+    short: '将多个 PDF 按顺序合并成一个 PDF',
+    title: 'PDF 合并 - 在线免费合并多个 PDF 文件 | CunConvert',
+    description:
+      '在线合并多个 PDF。无需上传文件，浏览器本地完成，可按需要调整文件顺序，把多个 PDF 依次拼接为一个 PDF，不改变原有内容。',
+    h1: 'PDF 合并',
+    intro:
+      '把多个 PDF 合并成一个。可以拖拽或用 ↑ ↓ 调整文件顺序，每个 PDF 的页面会按原顺序依次拼接，全程在浏览器本地完成。',
+    accept: '.pdf,application/pdf',
+    category: 'pdf',
+    related: ['pdf-split', 'pdf-organize', 'pdf-to-image', 'image-to-pdf'],
+  },
+  {
+    slug: 'pdf-split',
+    name: 'PDF 拆分',
+    short: '按每页、选中页或每 N 页把 PDF 拆成多份',
+    title: 'PDF 拆分 - 在线免费拆分 PDF 页面 | CunConvert',
+    description:
+      '在线拆分 PDF。无需上传文件，浏览器本地完成，支持每页单独拆分、按选中页拆分、每 N 页一组，并可一键打包 ZIP 下载。',
+    h1: 'PDF 拆分',
+    intro:
+      '把一个 PDF 拆成多份。可以每页单独拆、只拆出勾选的页面，或每 N 页合成一份，拆完的结果可一键打包下载。',
+    accept: '.pdf,application/pdf',
+    category: 'pdf',
+    related: ['pdf-merge', 'pdf-organize', 'pdf-to-image', 'image-to-pdf'],
+  },
+  {
+    slug: 'pdf-organize',
+    name: 'PDF 页面管理',
+    short: '删除、调整顺序、旋转 PDF 页面后导出',
+    title: 'PDF 页面管理 - 在线删除、排序与旋转 PDF 页面 | CunConvert',
+    description:
+      '在线整理 PDF 页面。无需上传文件，浏览器本地完成，支持删除不需要的页面、调整页面顺序、旋转页面方向，然后导出新的 PDF。',
+    h1: 'PDF 页面管理',
+    intro:
+      '整理 PDF 的页面：删掉不需要的页、调整先后顺序、旋转页面方向，处理完直接导出新的 PDF，所有操作都在浏览器本地完成。',
+    accept: '.pdf,application/pdf',
+    category: 'pdf',
+    related: ['pdf-merge', 'pdf-split', 'pdf-to-image', 'image-to-pdf'],
+  },
+
+  // ===== 二维码 =====
+  {
+    slug: 'qr-generator',
+    name: '二维码生成',
+    short: '输入网址或文本实时生成二维码，支持批量生成与 PNG / SVG 下载',
+    title: '二维码生成器 - 在线免费生成二维码 | CunConvert',
+    description:
+      '在线生成二维码。无需上传内容，浏览器本地生成，分网址、文本、批量三个版块，可自定义尺寸、边距与颜色，支持 PNG 与 SVG 下载。',
+    h1: '二维码生成器',
+    intro:
+      '分「网址链接」「文本生成」「批量生成」三个版块，实时生成二维码。可以调整尺寸、边距与前景背景色，下载为 PNG 或矢量 SVG；批量版块支持一次生成多个并打包下载。内容不会离开你的浏览器。',
+    accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp',
+    category: 'qr',
+    related: ['favicon-generator', 'svg-to-png', 'image-resizer', 'image-compressor'],
+  },
+
+  // ===== Favicon =====
+  {
+    slug: 'favicon-generator',
+    name: 'Favicon 生成',
+    short: '上传 Logo 一键生成网站图标全套尺寸与 favicon.ico',
+    title: 'Favicon 生成器 - 在线生成网站图标 ico 与多尺寸 PNG | CunConvert',
+    description:
+      '在线上传图片生成网站 favicon。无需上传文件，浏览器本地完成，自动生成 16/32/180/192/512 多尺寸 PNG、favicon.ico，并可打包 ZIP 下载与复制 HTML 引用代码。',
+    h1: 'Favicon 生成器',
+    intro:
+      '上传一张 Logo 或图片，自动生成网站常用的全套图标（含 favicon.ico 与多尺寸 PNG），一键打包下载，并附上可直接粘贴的 HTML 引用代码。',
+    accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp',
+    category: 'favicon',
+    related: ['image-resizer', 'image-cropper', 'remove-background', 'qr-generator'],
+  },
+
+  // ===== Markdown =====
+  {
+    slug: 'markdown-editor',
+    name: 'Markdown 编辑器',
+    short: '编辑预览 Markdown，还能把网页文章 / HTML 转成 Markdown',
+    title: 'Markdown 编辑器 - 在线实时预览与 HTML 转 Markdown | CunConvert',
+    description:
+      '在线 Markdown 编辑器。左侧编辑右侧实时预览，浏览器本地解析，支持导入导出 .md、导出与复制 HTML、本地草稿保存，还能把网页文章或 HTML 一键转成 Markdown。',
+    h1: 'Markdown 编辑器',
+    intro:
+      '一个干净、完全本地运行的 Markdown 编辑器：左边写，右边实时预览，支持导入导出 .md、导出 HTML，草稿自动保存在浏览器里。另设「文章 / HTML 转 Markdown」版块，粘贴网页正文或 HTML 源码即可转成 Markdown。',
+    accept: '.md,.markdown,.txt,text/markdown,text/plain',
+    category: 'markdown',
+    related: ['image-to-pdf', 'qr-generator', 'favicon-generator', 'svg-viewer'],
   },
 ];
 

@@ -1,0 +1,125 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="pdf-organize" shell="workspace" icon="▤">
+  <div class="upload-zone" data-dropzone>
+    <span class="uz-icon">▤</span>
+    <p class="uz-main">
+      点击 <button type="button" class="link" data-browse>选择 PDF</button>，或将 PDF 拖拽到此处
+    </p>
+    <p class="uz-sub">支持 .pdf · 可删除、调整顺序、旋转页面 · 文件仅在浏览器本地处理</p>
+    <input type="file" hidden data-file-input accept=".pdf,application/pdf" />
+  </div>
+
+  <div data-notice></div>
+
+  <div class="org-panel" data-org-panel hidden>
+    <p class="p2i-meta" data-pdf-meta></p>
+
+    <div class="org-head">
+      <span class="org-count" data-org-count></span>
+      <span class="org-tip">用 ⟲ ⟳ 旋转、↑ ↓ 调整顺序、✕ 删除页面</span>
+    </div>
+
+    <div class="org-list" data-org-list></div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" data-org-run disabled>导出 PDF</button>
+      <button type="button" class="btn-secondary" data-org-reset>重置</button>
+      <button type="button" class="btn-secondary" data-org-clear>清空</button>
+    </div>
+
+    <div class="progress" hidden data-org-progress>
+      <div class="bar"><i></i></div>
+      <span class="ptext" data-org-progress-text></span>
+    </div>
+
+    <div class="results" hidden data-org-results>
+      <div class="results-head"><span>导出结果</span></div>
+      <div data-org-result-items></div>
+    </div>
+  </div>
+</ToolPage>
+
+<style is:global>
+  .org-panel { margin-top: 22px; }
+  .org-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .org-count { font-size: 13px; color: var(--text-soft); }
+  .org-tip { font-size: 12px; color: var(--text-faint); }
+
+  .org-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+  .org-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+  .org-thumb-box {
+    flex: 0 0 auto;
+    width: 84px;
+    height: 84px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: var(--card);
+    border-radius: 4px;
+  }
+  .org-thumb {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+    transition: transform 0.18s ease;
+  }
+  .org-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .org-pos { font-size: 13px; font-weight: 550; }
+  .org-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg-tint);
+    border: 1px solid var(--border);
+    color: var(--text-soft);
+  }
+  .org-tools { display: flex; gap: 6px; flex: 0 0 auto; }
+  .org-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--card);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .org-btn:hover:not(:disabled) { border-color: var(--border-strong); background: var(--bg-tint); }
+  .org-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .org-empty { font-size: 13px; color: var(--text-faint); margin: 0; padding: 18px 0; }
+</style>

@@ -1,0 +1,73 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="pdf-split" shell="workspace" icon="▤">
+  <div class="upload-zone" data-dropzone>
+    <span class="uz-icon">▤</span>
+    <p class="uz-main">
+      点击 <button type="button" class="link" data-browse>选择 PDF</button>，或将 PDF 拖拽到此处
+    </p>
+    <p class="uz-sub">支持 .pdf · 文件仅在浏览器本地处理，不会上传</p>
+    <input type="file" hidden data-file-input accept=".pdf,application/pdf" />
+  </div>
+
+  <div data-notice></div>
+
+  <div class="p2i-panel" data-split-panel hidden>
+    <p class="p2i-meta" data-pdf-meta></p>
+
+    <div class="params-panel p2i-params">
+      <div class="param-block">
+        <div class="param-label">拆分方式</div>
+        <div class="seg" data-param="split-mode">
+          <button type="button" data-value="each" class="active">每页单独</button>
+          <button type="button" data-value="range">按选中页</button>
+          <button type="button" data-value="chunk">每 N 页一组</button>
+        </div>
+        <div class="param-note">「每页单独」把每一页拆成一个 PDF；「按选中页」只拆出勾选的页面</div>
+      </div>
+
+      <div class="param-block" data-chunk-block style="display:none">
+        <div class="param-label">每组合并页数</div>
+        <input
+          type="number"
+          class="input-text"
+          data-param="chunk-size"
+          min="1"
+          step="1"
+          value="2"
+          style="width:110px" />
+        <div class="param-note">例如填 2，则第 1–2 页、第 3–4 页各成一份</div>
+      </div>
+    </div>
+
+    <div class="p2i-toolbar" data-select-tools hidden>
+      <div class="p2i-tools">
+        <button type="button" class="btn-small" data-select-all>全选</button>
+        <button type="button" class="btn-small" data-select-none>全不选</button>
+        <button type="button" class="btn-small" data-invert>反选</button>
+      </div>
+      <span class="p2i-count" data-sel-count>已选 0 / 0 页</span>
+    </div>
+
+    <div class="p2i-grid" data-page-grid></div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" data-split-run disabled>开始拆分</button>
+      <button type="button" class="btn-secondary" data-split-clear>清空</button>
+    </div>
+
+    <div class="progress" hidden data-split-progress>
+      <div class="bar"><i></i></div>
+      <span class="ptext" data-split-progress-text></span>
+    </div>
+
+    <div class="results" hidden data-split-results>
+      <div class="results-head">
+        <span>拆分结果</span>
+        <button type="button" class="btn-small" data-split-zip>下载全部（ZIP）</button>
+      </div>
+      <div data-split-result-items></div>
+    </div>
+  </div>
+</ToolPage>

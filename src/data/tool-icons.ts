@@ -21,4 +21,12 @@ export const toolIcons: Record<string, string> = {
   'png-to-svg': '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/>',
   'jpg-to-svg': '<path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
   'webp-to-svg': '<path d="M3 17C3 11 9 9 12 9s9 2 9 8"/><circle cx="3" cy="17" r="1.4"/><circle cx="21" cy="17" r="1.4"/>',
+  'image-to-pdf': '<path d="M5 3h9l6 6v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6"/><path d="M7.5 18l3-3 2 2 3-3"/>',
+  'pdf-to-image': '<path d="M5 3h9l6 6v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v6h6"/><circle cx="9.5" cy="14" r="1.3"/><path d="M18 21l-4-4-4 4"/>',
+  'pdf-merge': '<path d="M6 3h7l5 5v4a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5"/><path d="M6 17h13m0 0l-3.5-3.5M19 17l-3.5 3.5"/>',
+  'pdf-split': '<path d="M5 3h7l5 5v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M12 3v5h5"/><path d="M4 17h16"/><path d="M8.5 14.5L6 17l2.5 2.5"/><path d="M15.5 14.5L18 17l-2.5 2.5"/>',
+  'pdf-organize': '<path d="M5 3h7l5 5v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M12 3v5h5"/><path d="M7.5 15.5h6M7.5 18.5h4"/><path d="M17.5 14.5a3 3 0 1 1-1.2 5.75"/>',
+  'qr-generator': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3z"/><path d="M20 14v3"/><path d="M14 20h3"/><path d="M20 20h1"/>',
+  'favicon-generator': '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 7l1.6 3.3 3.4.5-2.5 2.4.6 3.4-3.1-1.7-3.1 1.7.6-3.4L7 10.8l3.4-.5z"/>',
+  'markdown-editor': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15.5V9l3 3 3-3v6.5"/><path d="M16.5 9v4.5"/><path d="M14.5 12l2 2 2-2"/>',
 };

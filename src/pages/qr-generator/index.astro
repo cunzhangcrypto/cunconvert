@@ -1,0 +1,267 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="qr-generator" shell="workspace" icon="▩">
+  <div class="qr-tabs" role="tablist">
+    <button type="button" class="qr-tab active" data-qr-mode="url" role="tab">网址链接</button>
+    <button type="button" class="qr-tab" data-qr-mode="text" role="tab">文本生成</button>
+    <button type="button" class="qr-tab" data-qr-mode="batch" role="tab">批量生成</button>
+  </div>
+
+  {/* ---------- 版块 1：网址链接 ---------- */}
+  <section class="qr-panel" data-qr-panel="url">
+    <div class="qr-grid">
+      <div class="qr-col">
+        <div class="param-label">网址</div>
+        <input
+          type="text"
+          class="qr-input"
+          data-qr-url
+          placeholder="https://example.com"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="网址" />
+        <div class="param-note">建议填写完整网址（含 https://），扫码后可直接打开</div>
+      </div>
+      <div class="qr-col qr-col-preview">
+        <div class="qr-preview">
+          <canvas data-qr-canvas hidden></canvas>
+          <p class="qr-empty" data-qr-empty>输入网址后实时生成二维码</p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-primary" data-qr-png>下载 PNG</button>
+          <button type="button" class="btn-secondary" data-qr-svg>下载 SVG</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ---------- 版块 2：文本生成 ---------- */}
+  <section class="qr-panel" data-qr-panel="text" hidden>
+    <div class="qr-grid">
+      <div class="qr-col">
+        <div class="param-label">文本内容</div>
+        <textarea
+          class="qr-input qr-textarea"
+          data-qr-text
+          rows="6"
+          placeholder="任意文本：一段说明、联系方式、活动信息等"
+          aria-label="文本内容"></textarea>
+        <div class="param-note">支持中文、换行与任意字符</div>
+      </div>
+      <div class="qr-col qr-col-preview">
+        <div class="qr-preview">
+          <canvas data-qr-canvas hidden></canvas>
+          <p class="qr-empty" data-qr-empty>输入文本后实时生成二维码</p>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn-primary" data-qr-png>下载 PNG</button>
+          <button type="button" class="btn-secondary" data-qr-svg>下载 SVG</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ---------- 版块 3：批量生成 ---------- */}
+  <section class="qr-panel" data-qr-panel="batch" hidden>
+    <div class="qr-col">
+      <div class="param-label">每行一条内容</div>
+      <textarea
+        class="qr-input qr-textarea"
+        data-qr-batch
+        rows="8"
+        placeholder="https://example.com/a&#10;https://example.com/b&#10;任意文本也可以"
+        aria-label="批量内容"></textarea>
+      <div class="param-note">空行会自动忽略；每行生成一个二维码，可打包下载</div>
+      <div class="actions">
+        <button type="button" class="btn-primary" data-qr-batch-run>生成二维码</button>
+        <button type="button" class="btn-secondary" data-qr-batch-clear>清空</button>
+      </div>
+      <div class="progress" hidden data-qr-batch-progress>
+        <div class="bar"><i></i></div>
+        <span class="ptext" data-qr-batch-progress-text></span>
+      </div>
+    </div>
+
+    <div class="results" hidden data-qr-batch-results>
+      <div class="results-head">
+        <span>生成结果</span>
+        <button type="button" class="btn-small" data-qr-batch-zip>下载全部（ZIP）</button>
+      </div>
+      <div class="qr-batch-grid" data-qr-batch-grid></div>
+    </div>
+  </section>
+
+  {/* ---------- 三个版块共用的参数 ---------- */}
+  <div class="params-panel qr-params">
+    <div class="param-block">
+      <div class="param-label">尺寸</div>
+      <div class="seg" data-param="qr-size">
+        <button type="button" data-value="256">256</button>
+        <button type="button" data-value="512" class="active">512</button>
+        <button type="button" data-value="1024">1024</button>
+      </div>
+      <div class="param-note">导出 PNG 的像素边长（预览始终等比显示）</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">边距 <span class="hint">2</span></div>
+      <input type="range" class="input-num" data-param="qr-margin" min="0" max="8" value="2" />
+      <div class="param-note">四周静默区，建议保留 2–4 个模块</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">纠错等级</div>
+      <div class="seg" data-param="qr-level">
+        <button type="button" data-value="L">L</button>
+        <button type="button" data-value="M" class="active">M</button>
+        <button type="button" data-value="Q">Q</button>
+        <button type="button" data-value="H">H</button>
+      </div>
+      <div class="param-note">等级越高越耐污损，图案也越密</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">前景色</div>
+      <div class="input-row">
+        <input type="color" class="input-color" data-param="qr-dark" value="#0a0a0a" aria-label="前景色" />
+        <input type="text" class="input-text" data-param="qr-dark-text" value="#0a0a0a" style="width:96px" aria-label="前景色十六进制" />
+      </div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">背景色</div>
+      <div class="input-row">
+        <input type="color" class="input-color" data-param="qr-light" value="#ffffff" aria-label="背景色" />
+        <input type="text" class="input-text" data-param="qr-light-text" value="#ffffff" style="width:96px" aria-label="背景色十六进制" />
+      </div>
+    </div>
+  </div>
+
+  <div data-notice></div>
+  <p class="qr-tip">二维码在你的浏览器本地生成，输入内容不会上传。</p>
+</ToolPage>
+
+<style is:global>
+  /* 模式页签 */
+  .qr-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    background: var(--bg-tint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 22px;
+  }
+  .qr-tab {
+    flex: 1 1 0;
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-soft);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 550;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .qr-tab:hover { color: var(--text); }
+  .qr-tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  }
+
+  .qr-panel { display: block; }
+  .qr-panel[hidden] { display: none; }
+
+  .qr-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 28px;
+  }
+  @media (max-width: 860px) {
+    .qr-grid { grid-template-columns: 1fr; }
+  }
+
+  .qr-input {
+    width: 100%;
+    margin-top: 8px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .qr-input:focus { outline: none; border-color: var(--accent); background: var(--card); }
+  .qr-textarea { resize: vertical; }
+  .qr-input[type="text"] { height: 44px; }
+
+  .qr-col-preview { display: flex; flex-direction: column; gap: 12px; }
+  .qr-preview {
+    background: repeating-conic-gradient(var(--bg-tint) 0% 25%, var(--card) 0% 50%) 0 0 / 16px 16px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /*
+   * 关键：canvas 的像素尺寸（256/512/1024）与显示尺寸必须解耦。
+   * 只写 max-width 而不锁 aspect-ratio 时，flex 布局下高度不会等比缩放，
+   * 512/1024 会被纵向拉伸（实测 512 显示成 286×512）。这里锁死 1:1。
+   */
+  .qr-preview canvas {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+  }
+  .qr-empty { color: var(--text-faint); font-size: 13px; margin: 0; text-align: center; }
+
+  /* 批量结果网格 */
+  .qr-batch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .qr-batch-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+  .qr-batch-thumb {
+    width: 100%;
+    max-width: 110px;
+    aspect-ratio: 1 / 1;
+    display: block;
+    background: #fff;
+    border-radius: 4px;
+  }
+  .qr-batch-no { font-size: 12px; font-weight: 550; }
+  .qr-batch-text {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: center;
+    word-break: break-all;
+    line-height: 1.4;
+    max-height: 2.8em;
+    overflow: hidden;
+  }
+
+  .qr-params { margin-top: 24px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .qr-tip { font-size: 12px; color: var(--text-faint); margin: 14px 0 0; line-height: 1.5; }
+</style>

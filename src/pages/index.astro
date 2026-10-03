@@ -10,14 +10,15 @@ const jsonLd = JSON.stringify({
   '@type': 'WebSite',
   name: 'CunConvert',
   url: canonical || undefined,
-  description: '本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。文件均在浏览器本地处理，不会上传。',
+  description:
+    '本地文件工具箱：图片与 SVG 转换、压缩、裁剪、矢量化，以及 PDF 互转/合并/拆分/页面管理、二维码、Favicon 与 Markdown 编辑。文件均在浏览器本地处理，不会上传。',
   inLanguage: 'zh-CN',
 });
 ---
 
 <BaseLayout
-  title="CunConvert - 本地图片与 SVG 工具箱"
-  description="免费在线图片与 SVG 工具箱：SVG 转 PNG/JPG/WebP、PNG/JPG/WebP 互转、图片压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与图片矢量化。所有文件在浏览器本地处理，不会上传服务器。"
+  title="CunConvert - 本地图片、PDF 与文件工具箱"
+  description="免费在线工具箱：SVG 转 PNG/JPG/WebP、图片格式互转、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与矢量化，以及图片转 PDF、PDF 转图片、PDF 合并与拆分、PDF 页面管理、二维码生成、Favicon 生成与 Markdown 编辑器。所有文件在浏览器本地处理，不会上传服务器。"
   canonical={canonical}
   jsonLd={[jsonLd]}
 >
@@ -35,7 +36,7 @@ const jsonLd = JSON.stringify({
         <span class="hero-dash">——</span>
         <span class="hero-tagline">本地图片处理工作台</span>
       </h1>
-      <p class="hero-sub">格式转换 · 压缩 · 调整尺寸 · 裁剪 · SVG 优化与矢量化</p>
+      <p class="hero-sub">格式转换 · 压缩 · 裁剪 · SVG 优化 · PDF · 二维码 · Favicon · Markdown</p>
       <div class="hero-features">
         <span class="hf">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>

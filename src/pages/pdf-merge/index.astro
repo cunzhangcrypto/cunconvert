@@ -1,0 +1,17 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="pdf-merge" actionLabel="合并 PDF" icon="▤" resultTitle="合并结果">
+  <div class="param-block">
+    <div class="param-label">调整顺序</div>
+    <div class="param-note">
+      文件加入列表后，可拖拽文件行或用每行的 ↑ ↓ 按钮调整先后顺序——列表顺序就是合并后的页序。
+    </div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">合并方式</div>
+    <div class="param-note">
+      每个 PDF 的页面会按原顺序依次拼接；页眉页脚、书签等原有内容保持不变。至少需要 2 个 PDF。
+    </div>
+  </div>
+</ToolPage>

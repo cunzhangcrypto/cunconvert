@@ -1,0 +1,268 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="markdown-editor" shell="workspace" icon="✎">
+  <div class="md-tabs" role="tablist">
+    <button type="button" class="md-tab active" data-md-mode="edit" role="tab">编辑 · 预览</button>
+    <button type="button" class="md-tab" data-md-mode="import" role="tab">文章 / HTML 转 Markdown</button>
+  </div>
+
+  {/* ---------- 版块 1：编辑 + 实时预览 ---------- */}
+  <section class="md-panel" data-md-panel="edit">
+    <div class="md-toolbar">
+      <div class="md-tools">
+        <button type="button" class="btn-small" data-md-import-btn>导入 .md</button>
+        <button type="button" class="btn-small" data-md-export-md>导出 .md</button>
+        <button type="button" class="btn-small" data-md-export-html>导出 HTML</button>
+        <button type="button" class="btn-small" data-md-copy-html>复制 HTML</button>
+      </div>
+      <div class="md-tools">
+        <button type="button" class="btn-small" data-md-clear>清空</button>
+      </div>
+      <input type="file" hidden data-md-import accept=".md,.markdown,.txt,text/markdown,text/plain" />
+    </div>
+
+    <div data-notice></div>
+
+    <div class="md-split">
+      <div class="md-pane">
+        <div class="md-pane-head">Markdown</div>
+        <textarea
+          class="md-input"
+          data-md-input
+          spellcheck="false"
+          placeholder="在此输入 Markdown…"></textarea>
+      </div>
+      <div class="md-pane">
+        <div class="md-pane-head">预览</div>
+        <div class="md-preview md-body" data-md-preview></div>
+      </div>
+    </div>
+
+    <div class="md-status" data-md-status></div>
+  </section>
+
+  {/* ---------- 版块 2：文章 / HTML 转 Markdown ---------- */}
+  <section class="md-panel" data-md-panel="import" hidden>
+    <div class="md-toolbar">
+      <div class="md-tools">
+        <div class="seg" data-md-src-mode>
+          <button type="button" data-value="rich" class="active">粘贴富文本</button>
+          <button type="button" data-value="html">HTML 源码</button>
+        </div>
+      </div>
+      <div class="md-tools">
+        <button type="button" class="btn-small" data-md-html-upload-btn>上传 .html</button>
+        <button type="button" class="btn-small" data-md-html-clear>清空</button>
+        <button type="button" class="btn-primary" data-md-html-run>转换为 Markdown</button>
+      </div>
+      <input
+        type="file"
+        hidden
+        data-md-html-upload
+        accept=".html,.htm,.xhtml,.txt,text/html,text/plain" />
+    </div>
+
+    <div data-md-notice></div>
+
+    <div class="md-split">
+      <div class="md-pane">
+        <div class="md-pane-head">HTML / 文章内容</div>
+        <div
+          class="md-input md-rich"
+          contenteditable="true"
+          role="textbox"
+          aria-multiline="true"
+          spellcheck="false"
+          data-md-rich
+          data-placeholder="把网页正文或富文本直接粘贴到这里…（也可切到「HTML 源码」粘贴代码）"></div>
+        <textarea
+          class="md-input"
+          data-md-html
+          hidden
+          spellcheck="false"
+          placeholder="在此粘贴 HTML 源码，例如 <h1>标题</h1><p>正文</p>"></textarea>
+      </div>
+      <div class="md-pane">
+        <div class="md-pane-head">Markdown 结果</div>
+        <textarea
+          class="md-input"
+          data-md-out
+          readonly
+          spellcheck="false"
+          placeholder="转换结果会显示在这里…"></textarea>
+      </div>
+    </div>
+
+    <div class="md-import-actions">
+      <button type="button" class="btn-small" data-md-out-copy>复制 Markdown</button>
+      <button type="button" class="btn-small" data-md-out-download>下载 .md</button>
+      <button type="button" class="btn-small" data-md-out-to-editor>送入编辑器</button>
+    </div>
+    <div class="md-status" data-md-out-status></div>
+  </section>
+</ToolPage>
+
+<style is:global>
+  /* 版块页签 */
+  .md-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 5px;
+    background: var(--bg-tint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 22px;
+  }
+  .md-tab {
+    flex: 1 1 0;
+    padding: 9px 14px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-soft);
+    font-family: inherit;
+    font-size: 13.5px;
+    font-weight: 550;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .md-tab:hover { color: var(--text); }
+  .md-tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  }
+
+  .md-panel { display: block; }
+  .md-panel[hidden] { display: none; }
+
+  .md-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .md-tools { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  .md-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    align-items: stretch;
+  }
+  @media (max-width: 860px) {
+    .md-split { grid-template-columns: 1fr; }
+  }
+
+  .md-pane {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    overflow: hidden;
+    min-height: 460px;
+  }
+  .md-pane-head {
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    background: var(--bg-tint);
+    border-bottom: 1px solid var(--border);
+  }
+  .md-input {
+    flex: 1;
+    width: 100%;
+    min-height: 420px;
+    padding: 16px;
+    border: 0;
+    background: var(--card);
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 13.5px;
+    line-height: 1.7;
+    resize: none;
+  }
+  .md-input:focus { outline: none; }
+  .md-input[readonly] { color: var(--text-soft); }
+  .md-preview {
+    flex: 1;
+    padding: 16px 18px;
+    overflow: auto;
+    max-height: 620px;
+  }
+  .md-status {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+
+  /* 富文本粘贴区 */
+  .md-rich {
+    overflow: auto;
+    max-height: 620px;
+    white-space: normal;
+  }
+  .md-rich:empty::before {
+    content: attr(data-placeholder);
+    color: var(--text-faint);
+    pointer-events: none;
+  }
+  .md-rich:focus { outline: none; }
+  .md-rich img { max-width: 100%; }
+  .md-rich table { border-collapse: collapse; }
+  .md-rich th, .md-rich td { border: 1px solid var(--border); padding: 4px 8px; }
+
+  .md-import-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+  }
+
+  /* 渲染后的 Markdown 排版 */
+  .md-body { line-height: 1.75; font-size: 14.5px; color: var(--text); }
+  .md-body > :first-child { margin-top: 0; }
+  .md-body h1, .md-body h2, .md-body h3, .md-body h4 { line-height: 1.35; margin: 1.4em 0 0.6em; }
+  .md-body h1 { font-size: 1.6em; border-bottom: 1px solid var(--border); padding-bottom: 0.3em; }
+  .md-body h2 { font-size: 1.35em; border-bottom: 1px solid var(--border); padding-bottom: 0.25em; }
+  .md-body h3 { font-size: 1.15em; }
+  .md-body p { margin: 0.8em 0; }
+  .md-body ul, .md-body ol { padding-left: 1.5em; margin: 0.8em 0; }
+  .md-body li { margin: 0.3em 0; }
+  .md-body a { color: var(--accent); text-decoration: underline; }
+  .md-body blockquote {
+    margin: 0.9em 0;
+    padding: 0.2em 1em;
+    border-left: 3px solid var(--border-strong);
+    color: var(--text-soft);
+    background: var(--bg-tint);
+    border-radius: 0 4px 4px 0;
+  }
+  .md-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.9em;
+  }
+  .md-body :not(pre) > code {
+    background: var(--bg-tint);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .md-body pre {
+    background: var(--bg-tint);
+    padding: 14px;
+    border-radius: 8px;
+    overflow: auto;
+    border: 1px solid var(--border);
+  }
+  .md-body pre code { background: none; padding: 0; }
+  .md-body table { border-collapse: collapse; margin: 1em 0; width: 100%; }
+  .md-body th, .md-body td { border: 1px solid var(--border); padding: 6px 12px; text-align: left; }
+  .md-body th { background: var(--bg-tint); font-weight: 600; }
+  .md-body img { max-width: 100%; }
+  .md-body hr { border: 0; border-top: 1px solid var(--border); margin: 1.6em 0; }
+</style>

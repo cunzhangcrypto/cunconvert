@@ -204,12 +204,17 @@ a:hover { text-decoration: underline; }
   border-top: 1px solid var(--border);
   margin-top: 72px;
 }
+/*
+ * 8 个工具分类 → 品牌占左侧一列（跨两行），右侧 4 列 × 2 行。
+ * 分类数量变化时不用改这里：品牌固定跨 2 行，其余分类自动铺满右侧网格。
+ */
 .footer-inner {
   padding: 44px 24px 36px;
   display: grid;
-  grid-template-columns: 1.3fr 0.8fr 1fr 0.9fr 0.9fr;
-  gap: 32px;
+  grid-template-columns: 1.7fr repeat(4, minmax(0, 1fr));
+  gap: 30px 26px;
 }
+.footer-brand { grid-row: span 2; }
 .footer-brand p { color: var(--text-soft); font-size: 13.5px; max-width: 340px; line-height: 1.8; }
 .footer-legal { margin-top: 14px; }
 .footer-legal a { color: var(--accent-strong); font-size: 13.5px; font-weight: 600; }
@@ -238,12 +243,22 @@ a:hover { text-decoration: underline; }
   font-size: 12.5px;
 }
 
+@media (max-width: 1080px) {
+  /* 8 个分类在中等屏幕上挤成 4 列太窄，改成 3 列 */
+  .footer-inner { grid-template-columns: 1.3fr repeat(3, minmax(0, 1fr)); gap: 28px 24px; }
+}
 @media (max-width: 900px) {
-  .footer-inner { grid-template-columns: 1fr 1fr; gap: 28px; }
+  .footer-inner { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 24px; }
+  /* 品牌占满整行，分类两列排布 */
+  .footer-brand { grid-column: 1 / -1; grid-row: auto; }
 }
 @media (max-width: 760px) {
-  .footer-inner { grid-template-columns: 1fr; gap: 24px; }
   .nav .nav-link-label { display: none; }
+}
+@media (max-width: 560px) {
+  /* 手机上也保持两列：8 个分类单列排会拖得很长 */
+  .footer-inner { gap: 22px 18px; }
+  .footer-brand p { max-width: none; }
 }
 
 /* ===== 首页 ===== */
@@ -676,6 +691,91 @@ a:hover { text-decoration: underline; }
 }
 .file-del:hover { color: var(--danger); background: var(--danger-soft); }
 
+/* 可排序文件行（图片转 PDF / PDF 合并等） */
+.file-row.sortable { cursor: grab; }
+.file-row.sortable:active { cursor: grabbing; }
+.file-row.dragging { opacity: 0.45; }
+.file-row.drag-over { border-color: var(--accent-strong); background: var(--accent-soft); }
+.file-move { display: flex; flex-direction: column; gap: 2px; flex: none; }
+.file-move button {
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-soft);
+  cursor: pointer;
+  font-size: 10px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 5px;
+}
+.file-move button:hover:not(:disabled) { color: var(--text); border-color: var(--border-strong); }
+.file-move button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* 自定义工作区（二维码 / Favicon / Markdown 等非「上传→转换」型工具） */
+.tool-workspace {
+  margin-top: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+}
+
+/* PDF 页面缩略图网格（PDF → 图片 / PDF 拆分共用） */
+.p2i-panel { margin-top: 22px; }
+.p2i-meta {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: var(--text-soft);
+  word-break: break-all;
+}
+.p2i-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.p2i-tools { display: flex; gap: 8px; }
+.p2i-count { font-size: 13px; color: var(--text-soft); }
+.p2i-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.p2i-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.p2i-cell:hover { border-color: var(--border-strong); }
+.p2i-cell.selected { border-color: var(--accent); background: var(--bg-tint); }
+.p2i-thumb-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 110px;
+  background: var(--card);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.p2i-thumb { max-width: 100%; max-height: 150px; display: block; }
+.p2i-foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+.p2i-foot input { margin: 0; }
+.p2i-params { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
 /* 参数面板 */
 .params-panel {
   margin-top: 20px;
@@ -861,6 +961,15 @@ input[type="color"].input-color {
   background: var(--bg-tint);
   border: 1px solid var(--border);
   flex: none;
+}
+.result-thumb-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--text-faint);
 }
 .result-info { flex: 1; min-width: 0; }
 .result-info .ri-name { font-size: 13.5px; font-weight: 550; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

@@ -6,8 +6,8 @@ const canonical = canonicalUrl('/privacy/');
 ---
 
 <BaseLayout
-  title="隐私政策 - CunConvert | 文件不上传的本地图片工具"
-  description="CunConvert 隐私政策：所有图片与 SVG 文件均在浏览器本地处理，不会上传到任何服务器，无需注册、无追踪 Cookie。"
+  title="隐私政策 - CunConvert | 文件不上传的本地工具箱"
+  description="CunConvert 隐私政策：所有图片、SVG、PDF 与 Markdown 内容均在浏览器本地处理，不会上传到任何服务器，无需注册、无追踪 Cookie。"
   canonical={canonical}
 >
   <div class="container page">
@@ -18,7 +18,7 @@ const canonical = canonicalUrl('/privacy/');
     <div class="plain-page">
       <h2>1. 文件不上传</h2>
       <p>
-        本站所有工具（格式转换、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化、图片矢量化等）均在浏览器本地完成处理。你选择的文件不会离开你的设备，也不会被上传到任何服务器。
+        本站所有工具（格式转换、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化、图片矢量化、图片转 PDF、PDF 转图片、PDF 合并/拆分/页面管理、二维码生成、Favicon 生成、Markdown 编辑等）均在浏览器本地完成处理。你选择的文件、输入的文本与二维码内容不会离开你的设备，也不会被上传到任何服务器。
       </p>
       <h2>2. 我们收集哪些信息？</h2>
       <p>
@@ -26,11 +26,11 @@ const canonical = canonicalUrl('/privacy/');
       </p>
       <h2>3. 本地存储</h2>
       <p>
-        仅在你主动点击"切换明暗主题"后，浏览器会使用 localStorage 记住你的主题偏好。此外不写入任何本地数据。
+        浏览器本地存储仅在以下两种情况下使用：① 你主动点击"切换明暗主题"后，记住你的主题偏好；② 使用 Markdown 编辑器时，草稿会自动保存在你本机的 localStorage，便于下次继续编辑。这些数据都只存在你自己的设备上，不会同步或上传到任何服务器。
       </p>
       <h2>4. 第三方库</h2>
       <p>
-        部分工具会在需要时从 CDN 加载开源的图像处理库（如 svgo、imagetracerjs）。这些库运行在你的浏览器中，不会传输你的文件。
+        本站使用的开源处理库（如 svgo、JSZip、imagetracerjs、pdf-lib、PDF.js、qrcode、marked、DOMPurify）都随站点一起分发，直接从本站加载，不使用任何第三方 CDN。这些库全部运行在你的浏览器中，不会传输你的文件。
       </p>
       <h2>5. 关于外部链接</h2>
       <p>

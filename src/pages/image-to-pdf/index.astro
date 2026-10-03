@@ -1,0 +1,30 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="image-to-pdf" actionLabel="生成 PDF" icon="▤" resultTitle="PDF 结果">
+  <div class="param-block">
+    <div class="param-label">页面尺寸</div>
+    <div class="seg" data-param="page-size">
+      <button type="button" data-value="a4" class="active">A4</button>
+      <button type="button" data-value="fit">原图尺寸</button>
+    </div>
+    <div class="param-note">A4：统一纸张；原图尺寸：页面跟随图片比例</div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">页面方向</div>
+    <div class="seg" data-param="orientation">
+      <button type="button" data-value="portrait" class="active">纵向</button>
+      <button type="button" data-value="landscape">横向</button>
+    </div>
+    <div class="param-note">仅「A4」尺寸下生效</div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">页边距 <span class="hint">0</span></div>
+    <input type="range" class="input-num" data-param="margin" min="0" max="72" value="0" />
+    <div class="param-note">单位 pt（1 pt ≈ 1/72 英寸），常用 0–36</div>
+  </div>
+  <div class="param-block">
+    <div class="param-label">调整顺序</div>
+    <div class="param-note">拖拽文件行，或用每行的 ↑ ↓ 按钮调整页面先后顺序</div>
+  </div>
+</ToolPage>

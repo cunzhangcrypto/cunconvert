@@ -1,0 +1,136 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="favicon-generator" shell="workspace" icon="◎">
+  <div class="upload-zone" data-dropzone>
+    <span class="uz-icon">◎</span>
+    <p class="uz-main">
+      点击 <button type="button" class="link" data-browse>选择图片</button>，或将图片拖拽到此处
+    </p>
+    <p class="uz-sub">建议使用正方形 PNG（512×512 以上）· 文件仅在浏览器本地处理，不会上传</p>
+    <input
+      type="file"
+      hidden
+      data-file-input
+      accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp" />
+  </div>
+
+  <div class="params-panel fx-params">
+    <div class="param-block">
+      <div class="param-label">适配方式</div>
+      <div class="seg" data-param="fx-fit">
+        <button type="button" data-value="contain" class="active">完整显示</button>
+        <button type="button" data-value="cover">铺满裁剪</button>
+      </div>
+      <div class="param-note">非正方形图片建议用「完整显示」</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">背景</div>
+      <div class="seg" data-param="background">
+        <button type="button" data-value="transparent" class="active">透明</button>
+        <button type="button" data-value="white">白</button>
+        <button type="button" data-value="black">黑</button>
+        <button type="button" data-value="custom">自定义</button>
+      </div>
+      <div class="input-row" style="margin-top:8px">
+        <input type="color" class="input-color" data-param="background-color" value="#ffffff" aria-label="自定义背景色" />
+        <input type="text" class="input-text" data-param="background-custom" value="#ffffff" style="width:96px" aria-label="背景色十六进制" />
+      </div>
+      <div class="param-note">apple-touch-icon 会自动使用不透明底（默认白）</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">内边距 <span class="hint">0</span></div>
+      <input type="range" class="input-num" data-param="fx-padding" min="0" max="20" value="0" />
+      <div class="param-note">百分比，给图标留出呼吸空间</div>
+    </div>
+  </div>
+
+  <div data-notice></div>
+
+  <div class="fx-panel" data-fx-panel hidden>
+    <div class="fx-head">
+      <h3>生成结果</h3>
+      <button type="button" class="btn-primary" data-fx-zip>下载全部（ZIP）</button>
+    </div>
+    <div class="fx-grid" data-fx-grid></div>
+
+    <div class="fx-code-block">
+      <div class="fx-code-head">
+        <span>HTML 引用代码</span>
+        <button type="button" class="btn-small" data-fx-copy>复制代码</button>
+      </div>
+      <pre class="fx-code" data-fx-code></pre>
+    </div>
+  </div>
+</ToolPage>
+
+<style is:global>
+  .fx-params { margin-top: 22px; }
+  .fx-panel { margin-top: 24px; }
+  .fx-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .fx-head h3 { font-size: 15px; font-weight: 600; margin: 0; }
+  .fx-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .fx-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-soft);
+  }
+  .fx-thumb-box {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: repeating-conic-gradient(var(--bg-tint) 0% 25%, var(--card) 0% 50%) 0 0 / 12px 12px;
+    border-radius: 6px;
+  }
+  .fx-thumb { max-width: 64px; max-height: 64px; display: block; }
+  .fx-name {
+    font-size: 12px;
+    font-weight: 550;
+    text-align: center;
+    word-break: break-all;
+    line-height: 1.35;
+  }
+  .fx-meta { font-size: 11px; color: var(--text-faint); }
+  .fx-code-block { margin-top: 22px; }
+  .fx-code-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .fx-code {
+    margin: 0;
+    padding: 14px;
+    background: var(--bg-tint);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    color: var(--text);
+  }
+</style>

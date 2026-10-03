@@ -1,0 +1,83 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="pdf-to-image" shell="workspace" icon="▤">
+  <div class="upload-zone" data-dropzone>
+    <span class="uz-icon">▤</span>
+    <p class="uz-main">
+      点击 <button type="button" class="link" data-browse>选择 PDF</button>，或将 PDF 拖拽到此处
+    </p>
+    <p class="uz-sub">支持 .pdf · 文件仅在浏览器本地处理，不会上传</p>
+    <input type="file" hidden data-file-input accept=".pdf,application/pdf" />
+  </div>
+
+  <div data-notice></div>
+
+  <div class="p2i-panel" data-p2i-panel hidden>
+    <p class="p2i-meta" data-pdf-meta></p>
+
+    <div class="p2i-toolbar">
+      <div class="p2i-tools">
+        <button type="button" class="btn-small" data-select-all>全选</button>
+        <button type="button" class="btn-small" data-select-none>全不选</button>
+        <button type="button" class="btn-small" data-invert>反选</button>
+      </div>
+      <span class="p2i-count" data-sel-count>已选 0 / 0 页</span>
+    </div>
+
+    <div class="p2i-grid" data-page-grid></div>
+
+    <div class="params-panel p2i-params">
+      <div class="param-block">
+        <div class="param-label">输出格式</div>
+        <div class="seg" data-param="pdf-format">
+          <button type="button" data-value="png" class="active">PNG</button>
+          <button type="button" data-value="jpg">JPG</button>
+          <button type="button" data-value="webp">WebP</button>
+        </div>
+        <div class="param-note">PNG 无损且支持透明，JPG / WebP 体积更小</div>
+      </div>
+
+      <div class="param-block" data-quality-block style="display:none">
+        <div class="param-label">质量 <span class="hint">0.92</span></div>
+        <input
+          type="range"
+          class="input-num"
+          data-param="pdf-quality"
+          min="0.5"
+          max="1"
+          step="0.02"
+          value="0.92" />
+        <div class="param-note">仅 JPG / WebP 生效，数值越高越清晰</div>
+      </div>
+
+      <div class="param-block">
+        <div class="param-label">清晰度</div>
+        <div class="seg" data-param="pdf-scale">
+          <button type="button" data-value="1">标准</button>
+          <button type="button" data-value="2" class="active">高清 2×</button>
+          <button type="button" data-value="3">超清 3×</button>
+        </div>
+        <div class="param-note">倍率越高像素越多，文件也越大</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" data-pdf-convert disabled>导出选中页面</button>
+      <button type="button" class="btn-secondary" data-pdf-clear>清空</button>
+    </div>
+
+    <div class="progress" hidden data-pdf-progress>
+      <div class="bar"><i></i></div>
+      <span class="ptext" data-pdf-progress-text></span>
+    </div>
+
+    <div class="results" hidden data-pdf-results>
+      <div class="results-head">
+        <span>导出结果</span>
+        <button type="button" class="btn-small" data-pdf-zip>下载全部（ZIP）</button>
+      </div>
+      <div data-pdf-result-items></div>
+    </div>
+  </div>
+</ToolPage>

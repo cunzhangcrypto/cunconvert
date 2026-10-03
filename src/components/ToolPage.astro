@@ -10,9 +10,11 @@ interface Props {
   actionLabel?: string;
   icon?: string;
   resultTitle?: string;
+  /** convert = 标准「上传→转换→下载」外壳；workspace = 自定义工作区（无上传区） */
+  shell?: 'convert' | 'workspace';
 }
 
-const { slug, actionLabel, icon, resultTitle } = Astro.props;
+const { slug, actionLabel, icon, resultTitle, shell = 'convert' } = Astro.props;
 const tool = getTool(slug);
 const guide = getGuide(slug);
 const related = tool ? relatedTools(tool) : [];
@@ -77,9 +79,15 @@ const jsonLd = [
       <p class="intro">{tool.intro}</p>
     </div>
 
-    <ConvertShell slug={slug} accept={tool.accept} actionLabel={actionLabel} icon={icon} resultTitle={resultTitle}>
-      <div class="params-panel"><slot /></div>
-    </ConvertShell>
+    {
+      shell === 'convert' ? (
+        <ConvertShell slug={slug} accept={tool.accept} actionLabel={actionLabel} icon={icon} resultTitle={resultTitle}>
+          <div class="params-panel"><slot /></div>
+        </ConvertShell>
+      ) : (
+        <div class="tool-workspace" data-tool={slug}><slot /></div>
+      )
+    }
 
     {
       related.length > 0 && (

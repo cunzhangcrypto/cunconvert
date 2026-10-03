@@ -24,6 +24,14 @@ const map: Record<string, () => Promise<ToolModule>> = {
   'png-to-svg': () => import('./vectorize'),
   'jpg-to-svg': () => import('./vectorize'),
   'webp-to-svg': () => import('./vectorize'),
+  'image-to-pdf': () => import('./image-to-pdf'),
+  'pdf-to-image': () => import('./pdf-to-image'),
+  'pdf-merge': () => import('./pdf-merge'),
+  'pdf-split': () => import('./pdf-split'),
+  'pdf-organize': () => import('./pdf-organize'),
+  'qr-generator': () => import('./qr-generator'),
+  'favicon-generator': () => import('./favicon-generator'),
+  'markdown-editor': () => import('./markdown-editor'),
 };
 
 export async function mountTool(root: HTMLElement, slug: string): Promise<void> {
