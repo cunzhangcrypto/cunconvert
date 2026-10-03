@@ -8,7 +8,7 @@ function loadJszip(): Promise<typeof JSZipType> {
     cached = import('jszip')
       .then((m) => m.default)
       .catch(() => {
-        throw new ConvertError('ZIP 打包引擎加载失败，请检查网络后重试');
+        throw new ConvertError('ZIP 打包引擎加载失败，请刷新页面后重试');
       });
   }
   return cached;

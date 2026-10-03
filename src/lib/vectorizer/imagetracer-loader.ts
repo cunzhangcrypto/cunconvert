@@ -28,7 +28,7 @@ export function loadImageTracer(): Promise<NonNullable<Window['ImageTracer']>> {
         if (window.ImageTracer) resolve(window.ImageTracer);
         else reject(new ConvertError('矢量化引擎加载失败'));
       };
-      s.onerror = () => reject(new ConvertError('矢量化引擎加载失败，请检查网络后重试'));
+      s.onerror = () => reject(new ConvertError('矢量化引擎加载失败，请刷新页面后重试'));
       document.head.appendChild(s);
     });
   }
