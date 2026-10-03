@@ -14,3 +14,7 @@ Thumbs.db
 
 # AI 助手工作区（本地记忆 / 临时脚本，不入库）
 .workbuddy-ai/
+
+# e2e 测试夹具（临时生成，由隔离 workspace 的 make-fixtures.cjs 负责重建）
+.tmp-test/
+.tmp-lazy/
