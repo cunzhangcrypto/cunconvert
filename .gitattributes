@@ -1,0 +1,9 @@
+# 统一换行符为 LF。
+#
+# 本仓库原本就是纯 LF（core.autocrlf=false、无 .gitattributes，git 不做任何
+# 归一化）。若在 Windows 下用编辑器把文件存成 CRLF，diff 会把整份文件标成
+# 「全部重写」，真正的一行改动被淹没。
+#
+# text=auto 让 git 自动识别二进制文件（图片、ico 等不受影响）；
+# eol=lf 强制检出与入库都用 LF，从此不会再出现整文件 diff。
+* text=auto eol=lf

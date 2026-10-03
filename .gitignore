@@ -11,3 +11,6 @@ Thumbs.db
 # 环境变量
 .env
 .env.*
+
+# AI 助手工作区（本地记忆 / 临时脚本，不入库）
+.workbuddy-ai/
