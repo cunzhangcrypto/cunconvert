@@ -1,5 +1,5 @@
 import { ConvertError } from '../utils/errors';
-import { decodeToImage } from '../image/decode';
+import { decodeToImage, MAX_CANVAS_AREA } from '../image/decode';
 import { loadPdfLib } from './pdflib';
 
 /** A4 尺寸（pt，1pt = 1/72 英寸） */
@@ -76,6 +76,16 @@ async function rasterizeToPng(blob: Blob): Promise<Embeddable> {
   const w = img.naturalWidth || 0;
   const h = img.naturalHeight || 0;
   if (!w || !h) throw new ConvertError('无法读取图片尺寸，SVG 可能缺少 width/height 或 viewBox');
+
+  // ⚠️ 这里**只查面积**，不用 assertCanvasSize()。
+  // 画布的真实上限是「总面积」而不是单边（Chrome: 单边 65535、总面积 268M 像素）；
+  // 实测 20000×100 这种「很宽很扁」的图（面积仅 2MP）能正常画出 PDF，
+  // 而 assertCanvasSize 连单边 > 16384 也拒 —— 用了会把本来能用的图误拒。
+  // 面积超限时浏览器分配不出画布，toBlob 返回 null，只会得到「图片编码失败」这种
+  // 指错方向的提示，所以必须在这里先给出准确的尺寸错误。
+  if (w * h > MAX_CANVAS_AREA) {
+    throw new ConvertError(`图片尺寸过大（${w} × ${h}），浏览器无法分配画布，请先缩小后再试`);
+  }
 
   const canvas = document.createElement('canvas');
   canvas.width = w;

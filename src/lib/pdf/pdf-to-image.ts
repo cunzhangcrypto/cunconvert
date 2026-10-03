@@ -94,6 +94,8 @@ export async function renderPdfThumbnails(
       const viewport = page.getViewport({ scale });
       const width = Math.max(1, Math.floor(viewport.width));
       const height = Math.max(1, Math.floor(viewport.height));
+      // 缩略图正常会归一到 targetWidth 左右（≈130px），这里只是兜住异常大的页面尺寸
+      assertCanvasSize(width, height);
 
       const canvas = document.createElement('canvas');
       canvas.width = width;
