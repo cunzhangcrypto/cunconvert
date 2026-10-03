@@ -28,7 +28,7 @@ const orgLd = canonical
       name: 'CunConvert',
       url: canonical,
       logo: ogImageUrl,
-      description: '本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。所有文件在浏览器本地处理，不会上传服务器。',
+      description: '本地文件工具箱：图片与 SVG 转换、压缩、裁剪、矢量化，以及 PDF、二维码、Favicon 与 Markdown 编辑。所有文件在浏览器本地处理，不会上传服务器。',
     })
   : '';
 const allLd = orgLd ? [...jsonLd, orgLd] : jsonLd;
@@ -53,6 +53,8 @@ const allLd = orgLd ? [...jsonLd, orgLd] : jsonLd;
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
+    {/* ico 作为老浏览器 / Safari 的兜底，同时消掉浏览器对 /favicon.ico 的探测 404；现代浏览器仍优先用 svg */}
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <script is:inline>
       (function () {
