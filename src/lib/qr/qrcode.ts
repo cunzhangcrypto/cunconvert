@@ -49,11 +49,40 @@ function libOptions(opts: QrOpts): Record<string, unknown> {
   };
 }
 
+/**
+ * 各纠错等级下 byte 模式的**大致容量**（字符数），用于给出可行动的提示。
+ * 实测边界（`probe-qr-capacity.cjs`，纯 ASCII）：L≈2950 / M≈2300 / Q≈1650 / H≈1250。
+ * 中文等多字节字符会按字节计，实际能放的**字符数更少**，所以文案里写「约」。
+ */
+const CAPACITY: Record<QrOpts['level'], number> = { L: 2950, M: 2300, Q: 1650, H: 1250 };
+
+/**
+ * 把 qrcode 的异常翻译成中文。
+ * ⚠️ 内容超容量时它抛的是**普通 Error**（`The amount of data is too big to be stored in a QR Code`），
+ * 不匹配 `toUserMessage` 的任何规则 → 会被兜底成「处理失败…请尝试更换浏览器」，
+ * 把「内容太长」说成了「浏览器不行」，用户会去换浏览器，永远修不好。
+ */
+async function withQrErrors<T>(opts: QrOpts, fn: () => Promise<T>): Promise<T> {
+  try {
+    return await fn();
+  } catch (e) {
+    if (e instanceof ConvertError) throw e;
+    const msg = String((e as Error)?.message ?? '');
+    if (/too big|too long|overflow|code length/i.test(msg)) {
+      throw new ConvertError(
+        `内容过长，超出二维码容量上限：纠错等级 ${opts.level} 最多约 ${CAPACITY[opts.level]} 个字符。` +
+          `请缩短内容，或把纠错等级调低后重试。`,
+      );
+    }
+    throw e; // 其余异常原样抛出，交给 toUserMessage 兜底 + console.error 留痕
+  }
+}
+
 /** 把二维码画到给定 canvas 上（用于实时预览，避免 base64 往返） */
 export async function qrToCanvas(canvas: HTMLCanvasElement, text: string, opts: QrOpts): Promise<void> {
   if (!text) throw new ConvertError('请输入要生成二维码的内容');
   const QR = await loadQr();
-  await QR.toCanvas(canvas, text, libOptions(opts));
+  await withQrErrors(opts, () => Promise.resolve(QR.toCanvas(canvas, text, libOptions(opts))));
 }
 
 /** 生成 PNG Blob */
@@ -69,7 +98,7 @@ export async function qrToPngBlob(text: string, opts: QrOpts): Promise<Blob> {
 export async function qrToSvg(text: string, opts: QrOpts): Promise<string> {
   if (!text) throw new ConvertError('请输入要生成二维码的内容');
   const QR = await loadQr();
-  return QR.toString(text, { ...libOptions(opts), type: 'svg' });
+  return withQrErrors(opts, () => QR.toString(text, { ...libOptions(opts), type: 'svg' }));
 }
 
 /**
