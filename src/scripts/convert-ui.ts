@@ -75,7 +75,14 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
   if (!input || !fileList || !convertBtn) return;
 
   const items: FileItem[] = [];
+  /** 文件缩略图的 objectURL */
   const urls: string[] = [];
+  /**
+   * 结果行自己的 objectURL，**单独一份**。
+   * ⚠️ 重新转换时必须把上一轮的结果行连同它的 blob URL 一起释放，
+   * 否则旧行会一直留在列表里 —— 点它的「下载」拿到的是**上一轮**的文件。
+   */
+  const resultUrls: string[] = [];
   let busy = false;
   /** 合并模式（convertAll）的输出结果 */
   let mergedResults: ConvertOutput[] = [];
@@ -93,6 +100,18 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
 
   function clearNotice(): void {
     if (notice) notice.innerHTML = '';
+  }
+
+  /**
+   * 清空上一轮的结果行，并释放它们持有的 objectURL。
+   * 每次转换开始前都要调用 —— 否则改完参数再点一次「转换」，
+   * 新结果会**追加**在旧结果后面（列表翻倍，且旧行的下载拿到过期文件）。
+   */
+  function clearResults(): void {
+    for (const u of resultUrls) URL.revokeObjectURL(u);
+    resultUrls.length = 0;
+    if (resultItems) resultItems.innerHTML = '';
+    if (results) results.hidden = true;
   }
 
   /** 居中弹窗提示处理完成，3 秒后自动关闭 */
@@ -282,7 +301,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     busy = true;
     syncConvertState();
     clearNotice();
-    if (results) results.hidden = true;
+    clearResults(); // 先清掉上一轮结果行，避免重复转换时叠加
     if (zipBtn) zipBtn.disabled = true;
 
     const params = collectParams();
@@ -378,7 +397,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     let thumbUrl = '';
     try {
       thumbUrl = opts.preview ? await opts.preview(out.blob) : URL.createObjectURL(out.blob);
-      if (thumbUrl) urls.push(thumbUrl);
+      if (thumbUrl) resultUrls.push(thumbUrl);
     } catch {
       thumbUrl = '';
     }
@@ -446,8 +465,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     items.length = 0;
     mergedResults = [];
     if (fileList) fileList.innerHTML = '';
-    if (resultItems) resultItems.innerHTML = '';
-    if (results) results.hidden = true;
+    clearResults();
     if (progress) progress.hidden = true;
     if (zipBtn) zipBtn.disabled = true;
     clearNotice();
