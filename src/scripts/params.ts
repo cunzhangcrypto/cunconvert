@@ -58,6 +58,26 @@ export function initRangeHints(scope: HTMLElement): void {
   });
 }
 
+/**
+ * 颜色输入行同步：同一个 .input-row 内的取色器与文本框双向同步，
+ * 避免"手打 hex 不生效"或"选色后文本框不更新"的不一致。
+ */
+export function initColorRows(scope: HTMLElement): void {
+  const isHex = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim());
+  scope.querySelectorAll<HTMLElement>('.input-row').forEach((row) => {
+    const color = row.querySelector<HTMLInputElement>('input[type="color"]');
+    const text = row.querySelector<HTMLInputElement>('input[type="text"]');
+    if (!color || !text) return;
+    color.addEventListener('input', () => {
+      text.value = color.value;
+    });
+    text.addEventListener('input', () => {
+      const v = text.value.trim();
+      if (isHex(v)) color.value = v;
+    });
+  });
+}
+
 /** "原始/自定义"尺寸控件：切换时显示/隐藏自定义输入 */
 export function initSizeFields(scope: HTMLElement): void {
   const fields = scope.querySelector<HTMLElement>('[data-size-fields]');

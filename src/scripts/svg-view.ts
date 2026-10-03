@@ -47,12 +47,6 @@ export function mount(root: HTMLElement): void {
   function render(file: File, text: string, svgInfo: SvgInfo, url: string): void {
     if (!info) return;
     const size = formatBytes(file.size);
-    const dims =
-      svgInfo.width && svgInfo.height
-        ? `${svgInfo.width} × ${svgInfo.height} px`
-        : svgInfo.viewBox
-          ? '由 viewBox 决定'
-          : '未知';
 
     const rows: [string, string][] = [
       ['文件名', file.name],
@@ -118,7 +112,6 @@ export function mount(root: HTMLElement): void {
 
     panel.append(previewBox, infoBox);
     info.appendChild(panel);
-    void dims;
   }
 
   browse?.addEventListener('click', (e) => {

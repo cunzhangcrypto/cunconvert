@@ -1,11 +1,12 @@
 import { initConvertTool } from './convert-ui';
-import { initSegs, initRangeHints, num, type Params } from './params';
+import { initSegs, initRangeHints, initColorRows, num, type Params } from './params';
 import { removeBg, removeBgName } from '../lib/converters/remove-bg';
 
 /** 去背景：选择背景色 -> 变透明 PNG，全部本地处理 */
 export function mount(root: HTMLElement): void {
   initSegs(root);
   initRangeHints(root);
+  initColorRows(root);
 
   initConvertTool(root, {
     async convert(file, p: Params) {

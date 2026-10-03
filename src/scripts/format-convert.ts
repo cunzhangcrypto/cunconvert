@@ -1,5 +1,5 @@
 import { initConvertTool } from './convert-ui';
-import { initSegs, initRangeHints, num, resolveBackgroundParam } from './params';
+import { initSegs, initRangeHints, initColorRows, num, resolveBackgroundParam } from './params';
 import { convertRaster } from '../lib/converters/format';
 import { replaceExt } from '../lib/utils/file';
 
@@ -18,6 +18,7 @@ export function mount(root: HTMLElement): void {
   const allowTransparent = outputType !== 'jpg';
   initSegs(root);
   initRangeHints(root);
+  initColorRows(root);
 
   initConvertTool(root, {
     async convert(file, p) {

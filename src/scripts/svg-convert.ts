@@ -1,5 +1,5 @@
 import { initConvertTool } from './convert-ui';
-import { initSegs, initSizeFields, initRangeHints, num, resolveBackgroundParam } from './params';
+import { initSegs, initSizeFields, initRangeHints, initColorRows, num, resolveBackgroundParam } from './params';
 import { svgToBitmap } from '../lib/converters/svg-to-bitmap';
 import { replaceExt } from '../lib/utils/file';
 
@@ -16,6 +16,7 @@ export function mount(root: HTMLElement): void {
   initSegs(root);
   initSizeFields(root);
   initRangeHints(root);
+  initColorRows(root);
 
   initConvertTool(root, {
     async convert(file, p) {
