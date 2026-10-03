@@ -44,6 +44,8 @@ export function mount(root: HTMLElement): void {
   const urls: string[] = [];
   let outputs: { name: string; blob: Blob }[] = [];
   let busy = false;
+  /** 加载代际：只让最新一次 loadFile 的结果落地，避免旧加载覆盖新状态 */
+  let loadSeq = 0;
 
   function showNotice(msg: string, kind: 'info' | 'warn' | 'error' = 'error'): void {
     if (!notice) return;
@@ -129,6 +131,9 @@ export function mount(root: HTMLElement): void {
       showNotice('请选择 PDF 文件');
       return;
     }
+    // 代际令牌：慢的旧加载完成后不得覆盖新状态（连续选两次文件时，
+    // 先开始后完成的那次会把用户刚取消勾选的页静默重置为「全选」）。
+    const seq = ++loadSeq;
     source = file;
     outputs = [];
     selected.clear();
@@ -143,10 +148,12 @@ export function mount(root: HTMLElement): void {
     showNotice('');
     setProgress(true, 0.05, '正在解析 PDF…');
     try {
-      thumbs = await renderPdfThumbnails(file, 150, (done, total) => {
-        setProgress(true, done / total, `正在渲染页面预览 ${done} / ${total}`);
+      const t = await renderPdfThumbnails(file, 150, (done, total) => {
+        if (seq === loadSeq) setProgress(true, done / total, `正在渲染页面预览 ${done} / ${total}`);
       });
-      for (const t of thumbs) selected.add(t.page);
+      if (seq !== loadSeq) return; // 已被更新的加载取代 → 本次作废
+      thumbs = t;
+      for (const th of thumbs) selected.add(th.page);
       if (metaLine) {
         metaLine.textContent = `${file.name} · 共 ${thumbs.length} 页 · ${formatBytes(file.size)}`;
       }
@@ -154,6 +161,7 @@ export function mount(root: HTMLElement): void {
       renderGrid();
       setProgress(false);
     } catch (e) {
+      if (seq !== loadSeq) return;
       showNotice(toUserMessage(e));
       setProgress(false);
       source = null;

@@ -19,6 +19,16 @@ export function toUserMessage(e: unknown): string {
         return '当前浏览器不支持该功能，请更换较新的浏览器。';
       case 'InvalidStateError':
         return '文件状态无效，请重新选择文件。';
+      case 'NotReadableError':
+        // 常见于：文件被移动/删除、仍在同步中（OneDrive 等按需下载的占位文件）、
+        // 或所在磁盘被拔出 —— 浏览器拿不到内容。
+        return '无法读取文件内容，请确认文件仍在原位置（若在云盘同步目录中，请先下载到本地）后重试。';
+      case 'NotFoundError':
+        return '找不到该文件，可能已被移动或删除，请重新选择。';
+      case 'EncodingError':
+        return '文件编码异常，可能已损坏，请换一个文件重试。';
+      case 'QuotaExceededError':
+        return '浏览器存储空间不足，请关闭部分标签页后重试。';
     }
   }
   if (e instanceof Error && /memory|alloc|heap/i.test(e.message)) {
@@ -27,6 +37,11 @@ export function toUserMessage(e: unknown): string {
   if (e instanceof Error && /encoding|codec|decode|paint/i.test(e.message)) {
     return '图片解码失败，文件可能已损坏或格式不受支持。';
   }
+  // ⚠️ 走到这里说明是「未预期的错误」。必须把原始错误打出来 ——
+  // 否则线上只能看到一句兜底文案，连是哪个文件、什么原因都无从查起
+  // （2026-10-03 就因此排查了很久：真实原因是后缀与真实格式不符，
+  //  pdf-lib 抛了普通 Error 被这里吞掉）。
+  console.error('[cunconvert] 未预期的错误：', e);
   return '处理失败，请重试。如果问题持续出现，请尝试更换浏览器。';
 }
 
