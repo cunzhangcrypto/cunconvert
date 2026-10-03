@@ -1,8 +1,8 @@
 # CunConvert
 
-> 本地图片与 SVG 工具箱 —— 所有文件在浏览器本地处理，不会上传到任何服务器。
+> 本地文件工具箱 —— 所有文件在浏览器本地处理，不会上传到任何服务器。
 
-CunConvert 是一个**隐私优先**的图片与 SVG 在线工具箱：格式互转、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与查看、图片矢量化、去背景，共 19 个工具。所有处理都通过浏览器内置的 Canvas、Web Worker 与开源库在**你的设备上**完成——文件不出设备，无需注册，也没有上传等待。
+CunConvert 是一个**隐私优先**的在线工具箱：图片格式互转、压缩、调整尺寸、裁剪、旋转翻转、SVG 优化与查看、图片矢量化、去背景，以及 PDF（互转 / 合并 / 拆分 / 页面管理）、二维码（网址 / 文本 / 批量）、Favicon 生成与 Markdown 编辑器，共 27 个工具。所有处理都通过浏览器内置的 Canvas、Web Worker 与开源库在**你的设备上**完成——文件不出设备，无需注册，也没有上传等待。
 
 ## ✨ 功能
 
@@ -12,15 +12,20 @@ CunConvert 是一个**隐私优先**的图片与 SVG 在线工具箱：格式互
 | **图片转换** | PNG ↔ JPG、PNG ↔ WebP、JPG ↔ WebP 互转 |
 | **图片处理** | 图片压缩、调整尺寸、裁剪、旋转与翻转、去除图片背景 |
 | **图片矢量化** | PNG / JPG / WebP → SVG |
+| **PDF 工具** | 图片 → PDF、PDF → 图片、PDF 合并、PDF 拆分、PDF 页面管理（删除 / 排序 / 旋转） |
+| **二维码** | 二维码生成（网址 / 文本 / 批量，PNG / SVG） |
+| **Favicon** | Favicon 生成（.ico + 多尺寸 PNG + HTML 代码） |
+| **Markdown** | Markdown 编辑器（实时预览、导入导出、文章 / HTML 转 Markdown） |
 
 通用能力：
 
 - 🖥️ **本地处理**：全部在浏览器本地完成，无后端、无上传、无追踪
-- 📦 **批量处理**：一次选择多个文件，顺序转换，一键打包 ZIP 下载
+- 📦 **批量处理**：大部分工具支持一次选择多个文件、顺序转换，结果可一键打包 ZIP 下载
+- 🔀 **拖拽排序**：图片转 PDF 等工具可拖拽或用 ↑ ↓ 调整顺序
 - 🎨 **明暗主题**：浅色 / 深色 / 跟随系统
 - 📱 **响应式**：桌面与移动端均可使用
 - 🔒 **隐私安全**：无需注册，文件永远不会离开设备
-- 🚀 **按需加载**：SVGO / JSZip / ImageTracer 等重库仅在对应工具使用时动态加载
+- 🚀 **按需加载**：SVGO / JSZip / ImageTracer / PDF.js / pdf-lib / qrcode / marked / DOMPurify / turndown 等重库仅在对应工具使用时动态加载，首屏不为它们付出代价
 
 ## 🛠 技术栈
 
@@ -30,6 +35,11 @@ CunConvert 是一个**隐私优先**的图片与 SVG 在线工具箱：格式互
 - [SVGO](https://github.com/svg/svgo)（SVG 优化，动态导入）
 - [JSZip](https://stuk.github.io/jszip/)（ZIP 打包，动态导入）
 - [ImageTracer](https://github.com/jankovicsandras/imagetracerjs)（图片矢量化，本地 vendor 加载）
+- [pdf-lib](https://pdf-lib.js.org/)（生成 PDF，动态导入）
+- [PDF.js](https://mozilla.github.io/pdf.js/)（渲染 PDF，动态导入，worker 同源）
+- [qrcode](https://github.com/soldair/node-qrcode)（二维码生成，动态导入）
+- [marked](https://marked.js.org/) + [DOMPurify](https://github.com/cure53/DOMPurify)（Markdown 解析与 XSS 消毒，动态导入）
+- [turndown](https://github.com/mixmark-io/turndown) + [turndown-plugin-gfm](https://github.com/mixmark-io/turndown-plugin-gfm)（HTML 转 Markdown，动态导入）
 
 ## 📂 项目结构
 
@@ -40,16 +50,25 @@ src/
 │   ├── converters/  # 转换引擎（互转/压缩/尺寸/裁剪/旋转/矢量化/去背景）
 │   ├── image/       # 解码、画布尺寸校验、编码（toBlob / OffscreenCanvas）
 │   ├── svg/         # SVG 解析、安全清洗、SVGO 封装
+│   ├── pdf/         # PDF 引擎（图片合成 / 渲染为图片 / 合并 / 拆分 / 页面管理）
+│   ├── qr/          # 二维码生成
+│   ├── favicon/     # 多尺寸图标与 ICO 容器组装
+│   ├── markdown/    # Markdown 渲染与消毒、HTML 转 Markdown
 │   ├── utils/       # 错误映射（中文提示）、文件工具
 │   ├── vectorizer/  # ImageTracer 加载器与参数映射
 │   ├── worker/      # Web Worker 池（RasterJob）
 │   └── zip/         # JSZip 动态加载
 ├── components/      # 布局与 UI 组件（Header/Footer/ConvertShell/ToolPage…）
 ├── scripts/         # 各工具的前端交互脚本
-├── pages/           # 22+ 页面（首页 + 各工具页 + 隐私/关于/404）
+├── pages/           # 30+ 页面（首页 + 各工具页 + 隐私/关于/404）
 ├── layouts/         # BaseLayout（含全站动态背景层）
 └── styles/          # 设计 token（Mintlify 风格色板）与全局样式
 public/
+├── favicon.svg      # 站点图标（现代浏览器优先使用）
+├── favicon.ico      # 16 / 32 / 48 多尺寸，兼容老浏览器并消除 /favicon.ico 探测 404
+├── favicon.png      # 256×256 PNG（当前未被引用，留作备用）
+├── robots.txt       # 爬虫规则
+├── donate/          # 打赏收款码图片
 └── vendor/          # imagetracer_v1.2.6.js（本地加载，避免 CDN 依赖）
 ```
 
@@ -73,6 +92,8 @@ npm run preview
 ```
 
 > ⚠️ **正式域名通过构建环境变量 `SITE_URL` 提供**（例如 `https://pic.czlab.dev`），代码中没有写死任何域名。本地开发可以省略该变量；部署时在平台的环境变量中配置 `SITE_URL` 后重新构建，sitemap 与 canonical 链接才会指向正确地址。
+
+> 💡 **新增按需加载的重库时**：请把包名追加到 `astro.config.mjs` 的 `LAZY_DEPS` 数组。这些库都以 `await import()` 形式延迟加载，Vite 默认不会在启动时预打包，dev 下首次打开对应工具时可能返回 `504 (Outdated Optimize Dep)`，表现为「引擎加载失败」。列入 `LAZY_DEPS` 后会在启动时预构建，避免该问题（生产构建不受影响）。
 
 ## ☁️ 部署
 
@@ -128,9 +149,9 @@ npx wrangler pages deploy dist --project-name cunconvert
 
 ## 🕊️ 隐私声明
 
-- 所有图片与 SVG 文件**只在浏览器本地处理**，项目源码中不存在任何 `fetch` / `XHR` / 上传逻辑。
+- 所有图片、SVG、PDF 与 Markdown 内容**只在浏览器本地处理**，项目源码中不存在任何 `fetch` / `XHR` / 上传逻辑。
 - 不使用任何后端、数据库、第三方 AI API 或分析追踪。
-- 生成的图片、ZIP 等文件仅保存在你自己的设备中。
+- 生成的图片、PDF、ZIP 等文件仅保存在你自己的设备中；Markdown 草稿保存在本机 localStorage，不会同步到任何服务器。
 
 ## 📮 联系方式
 
