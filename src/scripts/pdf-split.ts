@@ -113,6 +113,8 @@ export function mount(root: HTMLElement): void {
       cb.addEventListener('change', toggle);
       cell.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).tagName === 'INPUT') return;
+        // 阻止 label 默认行为再次触发复选框（否则会翻转两次、净效果无变化）
+        e.preventDefault();
         cb.checked = !cb.checked;
         toggle();
       });

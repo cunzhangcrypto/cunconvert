@@ -323,13 +323,15 @@ export function mount(root: HTMLElement): void {
   });
 
   // ================= 初始化 =================
-  let initial = '';
+  // 区分「没有草稿」(null) 与「主动清空后保存的空草稿」('')：
+  // 前者显示示例文本，后者应尊重用户的清空操作，保持空编辑器。
+  let stored: string | null = null;
   try {
-    initial = localStorage.getItem(DRAFT_KEY) ?? '';
+    stored = localStorage.getItem(DRAFT_KEY);
   } catch {
-    initial = '';
+    stored = null;
   }
-  input.value = initial || SAMPLE;
+  input.value = stored !== null ? stored : SAMPLE;
   updateStatus();
   void render();
   setMode('edit');

@@ -99,15 +99,92 @@ async function rasterizeToPng(blob: Blob): Promise<Embeddable> {
   return { bytes: new Uint8Array(await png.arrayBuffer()), kind: 'png', width: w, height: h };
 }
 
+/** 解析 EXIF 方向用的扫描字节数（EXIF APP1 通常紧跟在 SOI 之后） */
+const EXIF_SCAN_LEN = 65536;
+
+/** 从 TIFF 头里读取 Orientation（0x0112） */
+function readExifOrientation(b: Uint8Array, start: number, end: number): number {
+  if (start + 8 > b.length) return 1;
+  const little = b[start] === 0x49 && b[start + 1] === 0x49;
+  const big = b[start] === 0x4d && b[start + 1] === 0x4d;
+  if (!little && !big) return 1;
+  const u16 = (p: number): number => (little ? b[p] | (b[p + 1] << 8) : (b[p] << 8) | b[p + 1]);
+  const u32 = (p: number): number =>
+    little
+      ? (b[p] | (b[p + 1] << 8) | (b[p + 2] << 16) | (b[p + 3] << 24)) >>> 0
+      : ((b[p] << 24) | (b[p + 1] << 16) | (b[p + 2] << 8) | b[p + 3]) >>> 0;
+  if (u16(start + 2) !== 0x002a) return 1;
+  const ifd0 = start + u32(start + 4);
+  if (ifd0 + 2 > b.length || ifd0 >= end) return 1;
+  const count = u16(ifd0);
+  for (let k = 0; k < count; k++) {
+    const entry = ifd0 + 2 + k * 12;
+    if (entry + 12 > b.length || entry + 12 > end) break;
+    if (u16(entry) === 0x0112) {
+      const val = u16(entry + 8);
+      return val >= 1 && val <= 8 ? val : 1;
+    }
+  }
+  return 1;
+}
+
+/**
+ * 读取 JPEG 的 EXIF Orientation（1-8）。无 EXIF 或解析失败时返回 1（正常方向）。
+ * 手机竖拍照片常带 Orientation=6/8，pdf-lib 透传原始字节时不会应用该方向，
+ * 会导致图片在 PDF 里躺倒，因此需要先探测出来再决定是否光栅化。
+ */
+function readJpegOrientation(b: Uint8Array): number {
+  if (b.length < 4 || b[0] !== 0xff || b[1] !== 0xd8) return 1;
+  let i = 2;
+  while (i + 4 <= b.length) {
+    if (b[i] !== 0xff) {
+      i++;
+      continue;
+    }
+    const marker = b[i + 1];
+    if (marker === 0xff) {
+      i++;
+      continue;
+    }
+    // 无长度字段的标记（SOI / TEM / RSTn）
+    if (marker === 0xd8 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) {
+      i += 2;
+      continue;
+    }
+    // SOS 之后是压缩数据，不再有元数据
+    if (marker === 0xda) break;
+    const len = (b[i + 2] << 8) | b[i + 3];
+    if (len < 2) break;
+    if (
+      marker === 0xe1 &&
+      i + 10 <= b.length &&
+      b[i + 4] === 0x45 && b[i + 5] === 0x78 && b[i + 6] === 0x69 && b[i + 7] === 0x66 &&
+      b[i + 8] === 0x00 && b[i + 9] === 0x00
+    ) {
+      return readExifOrientation(b, i + 10, i + 2 + len);
+    }
+    i += 2 + len;
+  }
+  return 1;
+}
+
 /**
  * 把任意浏览器可解码的图片转成 PDF 能嵌入的数据。
  * pdf-lib 只支持 PNG / JPEG：这两种直接透传原始字节（不重编码，画质无损、体积最小），
  * 其余格式先经 Canvas 光栅化成 PNG。
+ *
+ * 例外：带 EXIF 方向（Orientation ≠ 1）的 JPEG 必须光栅化 —— pdf-lib 透传原始字节时
+ * 不会应用 EXIF 旋转，嵌进 PDF 后会与用户在上传列表里看到的方向不一致（常见于手机照片）。
+ * Canvas 的 drawImage 会应用 EXIF 方向，因此重新编码成 PNG 才能得到正确的朝向。
  */
 async function toEmbeddable(blob: Blob): Promise<Embeddable> {
   const kind = await sniffKind(blob);
 
   if (kind === 'png' || kind === 'jpg') {
+    if (kind === 'jpg') {
+      const head = new Uint8Array(await blob.slice(0, EXIF_SCAN_LEN).arrayBuffer());
+      if (readJpegOrientation(head) !== 1) return rasterizeToPng(blob);
+    }
     const img = await decodeToImage(blob);
     if (!img.naturalWidth || !img.naturalHeight) throw new ConvertError('无法读取图片尺寸');
     return {

@@ -45,9 +45,17 @@ export interface ConvertToolOptions {
 interface FileItem {
   file: File;
   row: HTMLElement;
-  thumb: HTMLImageElement;
+  /** 缩略图 objectURL；非图片文件（如 PDF）没有缩略图，为 null */
+  thumbUrl: string | null;
   status: HTMLElement;
   results: ConvertOutput[];
+}
+
+/** 文件名后缀兜底：部分来源（拖拽、另存）的 file.type 可能为空 */
+const IMAGE_NAME_RE = /\.(png|jpe?g|webp|gif|bmp|svg|avif|ico)$/i;
+
+function isImageFile(file: File): boolean {
+  return file.type.startsWith('image/') || IMAGE_NAME_RE.test(file.name);
 }
 
 /**
@@ -163,21 +171,30 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     syncConvertState();
   }
 
-  function makeThumb(file: File): { img: HTMLImageElement; url: string } {
+  function makeThumb(file: File): { el: HTMLElement; url: string | null } {
+    // 非图片文件（PDF 等）用 <img> 解码必然失败、显示破图，改为文字占位。
+    if (!isImageFile(file)) {
+      const ph = document.createElement('span');
+      ph.className = 'file-thumb file-thumb-ph';
+      const ext = file.name.includes('.') ? file.name.split('.').pop() ?? '' : '';
+      ph.textContent = (ext || 'FILE').toUpperCase().slice(0, 4);
+      ph.title = file.name;
+      return { el: ph, url: null };
+    }
     const url = URL.createObjectURL(file);
     urls.push(url);
     const img = document.createElement('img');
     img.className = 'file-thumb';
     img.alt = file.name;
     img.src = url;
-    return { img, url };
+    return { el: img, url };
   }
 
   function addFile(file: File): void {
     const row = document.createElement('div');
     row.className = 'file-row';
 
-    const { img } = makeThumb(file);
+    const { el: thumbEl, url: thumbUrl } = makeThumb(file);
 
     const info = document.createElement('div');
     info.className = 'file-info';
@@ -201,13 +218,21 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
     del.setAttribute('aria-label', '移除文件');
     del.addEventListener('click', () => {
       const i = items.findIndex((it) => it.row === row);
-      if (i >= 0) items.splice(i, 1);
+      if (i >= 0) {
+        const [removed] = items.splice(i, 1);
+        // 立即释放该文件的缩略图 objectURL，避免反复“加文件→删文件”持续泄漏
+        if (removed?.thumbUrl) {
+          URL.revokeObjectURL(removed.thumbUrl);
+          const ui = urls.indexOf(removed.thumbUrl);
+          if (ui >= 0) urls.splice(ui, 1);
+        }
+      }
       row.remove();
       updateMoveButtons();
       syncConvertState();
     });
 
-    const item: FileItem = { file, row, thumb: img, status, results: [] };
+    const item: FileItem = { file, row, thumbUrl, status, results: [] };
 
     if (opts.sortable) {
       row.classList.add('sortable');
@@ -227,7 +252,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
       down.setAttribute('aria-label', '下移');
       down.addEventListener('click', () => moveItem(items.indexOf(item), items.indexOf(item) + 1));
       move.append(up, down);
-      row.append(img, info, status, move, del);
+      row.append(thumbEl, info, status, move, del);
       row.addEventListener('dragstart', (e) => {
         dragIndex = items.indexOf(item);
         row.classList.add('dragging');
@@ -248,7 +273,7 @@ export function initConvertTool(scope: HTMLElement, opts: ConvertToolOptions): v
         moveItem(dragIndex, items.indexOf(item));
       });
     } else {
-      row.append(img, info, status, del);
+      row.append(thumbEl, info, status, del);
     }
 
     fileList?.appendChild(row);

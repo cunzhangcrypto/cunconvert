@@ -86,15 +86,26 @@ export function mount(root: HTMLElement): void {
     }
   }
 
+  let pending = false;
+
   async function generate(): Promise<void> {
-    if (!source || busy) return;
+    if (!source) return;
+    if (busy) {
+      // 正在生成时又来了新的参数改动：记账，等这轮结束用最新参数再跑一次，
+      // 否则拖动滑块时的最后一次改动会被静默丢弃（界面值与结果不一致）。
+      pending = true;
+      return;
+    }
     busy = true;
     try {
-      showNotice('');
-      outputs = await generateFaviconSet(source, readOpts());
-      renderGrid();
-      if (codeBox) codeBox.textContent = faviconHtmlCode();
-      if (panel) panel.hidden = false;
+      do {
+        pending = false;
+        showNotice('');
+        outputs = await generateFaviconSet(source, readOpts());
+        renderGrid();
+        if (codeBox) codeBox.textContent = faviconHtmlCode();
+        if (panel) panel.hidden = false;
+      } while (pending);
     } catch (e) {
       showNotice(toUserMessage(e));
     } finally {

@@ -64,6 +64,15 @@ export function initRangeHints(scope: HTMLElement): void {
  */
 export function initColorRows(scope: HTMLElement): void {
   const isHex = (v: string) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim());
+  // input[type=color] 只接受 #rrggbb，3 位简写会被浏览器重置为 #000000，
+  // 因此同步前必须先把 #rgb 展开成 #rrggbb。
+  const toLongHex = (v: string): string => {
+    const s = v.trim().toLowerCase();
+    if (/^#[0-9a-f]{3}$/.test(s)) {
+      return '#' + s.slice(1).split('').map((c) => c + c).join('');
+    }
+    return s;
+  };
   scope.querySelectorAll<HTMLElement>('.input-row').forEach((row) => {
     const color = row.querySelector<HTMLInputElement>('input[type="color"]');
     const text = row.querySelector<HTMLInputElement>('input[type="text"]');
@@ -73,7 +82,7 @@ export function initColorRows(scope: HTMLElement): void {
     });
     text.addEventListener('input', () => {
       const v = text.value.trim();
-      if (isHex(v)) color.value = v;
+      if (isHex(v)) color.value = toLongHex(v);
     });
   });
 }

@@ -33,8 +33,11 @@ async function loadQr(): Promise<QrLib> {
   if (!cached) {
     cached = import('qrcode')
       .then((m) => ((m as { default?: QrLib }).default ?? (m as unknown as QrLib)))
-      .catch(() => {
-        throw new ConvertError('二维码引擎加载失败，请刷新页面后重试');
+      .catch((e) => {
+        // 与其它引擎保持一致：失败时清空缓存，避免一次失败后永久失败，
+        // 刷新页面 / 重试时能重新加载。
+        cached = null;
+        throw e instanceof ConvertError ? e : new ConvertError('二维码引擎加载失败，请刷新页面后重试');
       });
   }
   return cached;
@@ -83,6 +86,10 @@ export async function qrToCanvas(canvas: HTMLCanvasElement, text: string, opts: 
   if (!text) throw new ConvertError('请输入要生成二维码的内容');
   const QR = await loadQr();
   await withQrErrors(opts, () => Promise.resolve(QR.toCanvas(canvas, text, libOptions(opts))));
+  // qrcode 库会往 canvas 写入内联 style.width/height（如 320px），
+  // 优先级高于预览区的响应式 CSS，会导致窄屏横向溢出。清掉内联样式，让布局交给 CSS。
+  canvas.style.removeProperty('width');
+  canvas.style.removeProperty('height');
 }
 
 /** 生成 PNG Blob */

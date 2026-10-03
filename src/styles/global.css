@@ -658,6 +658,16 @@ a:hover { text-decoration: underline; }
   border: 1px solid var(--border);
   flex: none;
 }
+/* 非图片文件（PDF 等）的文字占位缩略图 */
+.file-thumb-ph {
+  display: grid;
+  place-items: center;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text-faint);
+  background: linear-gradient(135deg, var(--accent-soft), var(--bg-tint));
+}
 .file-info { flex: 1; min-width: 0; }
 .file-info .fi-name {
   font-size: 13.5px;
