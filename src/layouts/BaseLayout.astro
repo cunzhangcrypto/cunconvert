@@ -11,7 +11,7 @@ interface Props {
   jsonLd?: string[];
 }
 
-const { title, description, canonical = '', ogImage = '/favicon.svg', jsonLd = [] } = Astro.props;
+const { title, description, canonical = '', ogImage = '/og.png', jsonLd = [] } = Astro.props;
 let ogImageUrl = '';
 if (canonical) {
   try {

@@ -67,6 +67,7 @@ public/
 ├── favicon.svg      # 站点图标（现代浏览器优先使用）
 ├── favicon.ico      # 16 / 32 / 48 多尺寸，兼容老浏览器并消除 /favicon.ico 探测 404
 ├── favicon.png      # 256×256 PNG（当前未被引用，留作备用）
+├── og.png           # 1200×630 社交分享卡片（og:image / twitter:image）
 ├── robots.txt       # 爬虫规则
 ├── donate/          # 打赏收款码图片
 └── vendor/          # imagetracer_v1.2.6.js（本地加载，避免 CDN 依赖）
