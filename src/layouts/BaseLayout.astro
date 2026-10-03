@@ -54,14 +54,6 @@ const allLd = orgLd ? [...jsonLd, orgLd] : jsonLd;
     <meta name="twitter:description" content={description} />
     {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <!-- Google Analytics (gtag.js) -->
-    <script is:inline async src="https://www.googletagmanager.com/gtag/js?id=G-F1FR3H0K90"></script>
-    <script is:inline>
-      window.dataLayer = window.dataLayer || [];
-      function gtag() { dataLayer.push(arguments); }
-      gtag('js', new Date());
-      gtag('config', 'G-F1FR3H0K90');
-    </script>
     <script is:inline>
       (function () {
         try {
