@@ -1,5 +1,5 @@
 import { initConvertTool, type ConvertOutput } from './convert-ui';
-import { initSegs, bindSeg, num, type Params } from './params';
+import { initSegs, bindSeg, num, readParams, type Params } from './params';
 import { cropImage } from '../lib/converters/crop';
 import { decodeToImage } from '../lib/image/decode';
 import { replaceExt } from '../lib/utils/file';
@@ -41,6 +41,15 @@ export function mount(root: HTMLElement): void {
 
   // ---- 裁剪选区状态 ----
   let state: CropState | null = null;
+  /** 解码后的原图，旋转/翻转时用它重绘预览 */
+  let srcImg: HTMLImageElement | null = null;
+  /**
+   * 当前的旋转 / 翻转。**预览与导出共用同一套变换**，所以是「先旋转再裁剪」：
+   * 用户在旋转后的画面上拖裁剪框，导出时把框映射回原图坐标交给引擎。
+   */
+  let rotate: 0 | 90 | 180 | 270 = 0;
+  let flipH = false;
+  let flipV = false;
   const overlay = document.createElement('div');
   overlay.className = 'crop-overlay';
   const handles = ['nw', 'ne', 'sw', 'se'].map((h) => {
@@ -208,21 +217,112 @@ export function mount(root: HTMLElement): void {
   wrap.addEventListener('pointerup', endDrag);
   wrap.addEventListener('pointercancel', endDrag);
 
+  // ---- 旋转 / 翻转 ----
+  /** 旋转后画布的宽高（90°/270° 时宽高互换） */
+  function rotatedDims(s: CropState): { tw: number; th: number } {
+    const swap = rotate === 90 || rotate === 270;
+    return { tw: swap ? s.nh : s.nw, th: swap ? s.nw : s.nh };
+  }
+
+  /** 按当前旋转/翻转重绘预览，并同步 dispW/dispH */
+  function renderPreview(): void {
+    if (!state || !srcImg) return;
+    const s = state;
+    const { tw, th } = rotatedDims(s);
+    const scale = Math.min(760 / tw, 520 / th, 1);
+    const sw = Math.max(1, Math.round(s.nw * scale));
+    const sh = Math.max(1, Math.round(s.nh * scale));
+    const swap = rotate === 90 || rotate === 270;
+    s.dispW = swap ? sh : sw;
+    s.dispH = swap ? sw : sh;
+    canvas!.width = s.dispW;
+    canvas!.height = s.dispH;
+    const ctx = canvas!.getContext('2d');
+    if (!ctx) throw new Error('无法创建绘图上下文');
+    ctx.clearRect(0, 0, s.dispW, s.dispH);
+    // 与 imageToCanvas / worker 完全相同的变换顺序：先翻转再旋转，最后平移到中心
+    ctx.save();
+    ctx.translate(s.dispW / 2, s.dispH / 2);
+    if (rotate) ctx.rotate((rotate * Math.PI) / 180);
+    if (flipH) ctx.scale(-1, 1);
+    if (flipV) ctx.scale(1, -1);
+    ctx.drawImage(srcImg, -sw / 2, -sh / 2, sw, sh);
+    ctx.restore();
+  }
+
+  /**
+   * 把「旋转/翻转后」图像上的一个点映射回**原图**坐标。
+   * 引擎（convertRaster）的语义是「先按 crop 取原图区域，再旋转」，
+   * 而界面语义是「先旋转，再裁剪」。两者等价当且仅当传给引擎的是
+   * 选中区域在**原图**中的位置，所以这里必须做逆变换。
+   */
+  function transformedToOriginal(px: number, py: number): { x: number; y: number } {
+    const s = state!;
+    const { tw, th } = rotatedDims(s);
+    const rx = px - tw / 2;
+    const ry = py - th / 2;
+    let fx: number;
+    let fy: number;
+    if (rotate === 90) {
+      fx = ry;
+      fy = -rx;
+    } else if (rotate === 180) {
+      fx = -rx;
+      fy = -ry;
+    } else if (rotate === 270) {
+      fx = -ry;
+      fy = rx;
+    } else {
+      fx = rx;
+      fy = ry;
+    }
+    const cx = flipH ? -fx : fx;
+    const cy = flipV ? -fy : fy;
+    return { x: cx + s.nw / 2, y: cy + s.nh / 2 };
+  }
+
+  /** 从控件读当前变换值（不触发重绘） */
+  function readTransform(): { rotate: 0 | 90 | 180 | 270; flipH: boolean; flipV: boolean } {
+    const p = readParams(root);
+    const r = num(p['crop-rotate']) ?? 0;
+    const rr = r === 90 || r === 180 || r === 270 ? r : 0;
+    return { rotate: rr, flipH: !!p['crop-flipH'], flipV: !!p['crop-flipV'] };
+  }
+
+  /** 变换改变后：重绘预览、重置裁剪框（宽高比变了，旧框已无意义） */
+  function syncTransform(): void {
+    const t = readTransform();
+    if (t.rotate === rotate && t.flipH === flipH && t.flipV === flipV) return;
+    rotate = t.rotate;
+    flipH = t.flipH;
+    flipV = t.flipV;
+    if (!state || !srcImg) return;
+    renderPreview();
+    state.rect = fitRect(RATIOS[state.ratio] ?? null);
+    drawOverlay();
+  }
+
   // ---- 参数读取 ----
   function getParams(): Params {
     if (!state) return {};
-    const f = {
-      x: state.rect.x / state.dispW,
-      y: state.rect.y / state.dispH,
-      w: state.rect.w / state.dispW,
-      h: state.rect.h / state.dispH,
-    };
-    const rotateEl = root.querySelector<HTMLElement>('.seg[data-crop-rotate] button.active');
-    const flipH = root.querySelector<HTMLInputElement>('input[data-param="crop-flipH"]')?.checked ?? false;
-    const flipV = root.querySelector<HTMLInputElement>('input[data-param="crop-flipV"]')?.checked ?? false;
+    const s = state;
+    // 1) 屏幕上的裁剪框 → 「旋转后」图像的像素坐标
+    const { tw, th } = rotatedDims(s);
+    const tx = (s.rect.x / s.dispW) * tw;
+    const ty = (s.rect.y / s.dispH) * th;
+    const tRectW = (s.rect.w / s.dispW) * tw;
+    const tRectH = (s.rect.h / s.dispH) * th;
+    // 2) 逆变换回原图坐标（引擎在原图空间裁剪）
+    const a = transformedToOriginal(tx, ty);
+    const b = transformedToOriginal(tx + tRectW, ty + tRectH);
+    const ox = Math.max(0, Math.min(s.nw, Math.min(a.x, b.x)));
+    const oy = Math.max(0, Math.min(s.nh, Math.min(a.y, b.y)));
+    const ow = Math.max(1, Math.min(s.nw - ox, Math.abs(b.x - a.x)));
+    const oh = Math.max(1, Math.min(s.nh - oy, Math.abs(b.y - a.y)));
+    // 返回原图的比例值，多文件时各文件按自身尺寸换算
     return {
-      cropFrac: f,
-      rotate: num(rotateEl?.getAttribute('data-value')) ?? 0,
+      cropFrac: { x: ox / s.nw, y: oy / s.nh, w: ow / s.nw, h: oh / s.nh },
+      rotate,
       flipH,
       flipV,
     };
@@ -237,17 +337,15 @@ export function mount(root: HTMLElement): void {
       const nw = img.naturalWidth;
       const nh = img.naturalHeight;
       if (!nw || !nh) throw new Error('无法读取图片尺寸');
-      const scale = Math.min(760 / nw, 520 / nh, 1);
-      const dispW = Math.max(1, Math.round(nw * scale));
-      const dispH = Math.max(1, Math.round(nh * scale));
-      canvas!.width = dispW;
-      canvas!.height = dispH;
-      const ctx = canvas!.getContext('2d');
-      if (!ctx) throw new Error('无法创建绘图上下文');
-      ctx.drawImage(img, 0, 0, dispW, dispH);
-      state = { nw, nh, dispW, dispH, rect: { x: 0, y: 0, w: dispW, h: dispH }, ratio: 'free' };
-      const ratio = RATIOS[state.ratio] ?? null;
-      state.rect = fitRect(ratio);
+      srcImg = img;
+      const t = readTransform();
+      rotate = t.rotate;
+      flipH = t.flipH;
+      flipV = t.flipV;
+      const ratio = (readParams(root)['crop-ratio'] as string) || 'free';
+      state = { nw, nh, dispW: nw, dispH: nh, rect: { x: 0, y: 0, w: nw, h: nh }, ratio };
+      renderPreview();
+      state.rect = fitRect(RATIOS[state.ratio] ?? null);
       stage!.hidden = false;
       drawOverlay();
     } catch (e) {
@@ -263,6 +361,12 @@ export function mount(root: HTMLElement): void {
   }
 
   bindSeg(root, 'crop-ratio', setRatio);
+  bindSeg(root, 'crop-rotate', syncTransform);
+  for (const key of ['crop-flipH', 'crop-flipV']) {
+    root
+      .querySelector<HTMLInputElement>(`input[data-param="${key}"]`)
+      ?.addEventListener('change', syncTransform);
+  }
 
   // ---- 转换 ----
   initConvertTool(root, {
@@ -281,7 +385,12 @@ export function mount(root: HTMLElement): void {
         h: Math.round(f.h * nh),
       };
       if (crop.w < 1 || crop.h < 1) throw new Error('裁剪区域无效，请重新选择');
-      const res = await cropImage(file, crop, (num(p.rotate) ?? 0) as 0 | 90 | 180 | 270);
+      const res = await cropImage(file, {
+        crop,
+        rotate: (num(p.rotate) ?? 0) as 0 | 90 | 180 | 270,
+        flipH: !!p.flipH,
+        flipV: !!p.flipV,
+      });
       return {
         blob: res.blob,
         name: replaceExt(file.name, res.ext),

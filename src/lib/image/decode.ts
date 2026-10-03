@@ -70,7 +70,12 @@ export function imageToCanvas(img: HTMLImageElement, opts: DrawOpts): HTMLCanvas
   if (opts.rotate) ctx.rotate((opts.rotate * Math.PI) / 180);
   if (opts.flipH) ctx.scale(-1, 1);
   if (opts.flipV) ctx.scale(1, -1);
-  ctx.drawImage(img, crop?.x ?? 0, crop?.y ?? 0, srcW, srcH, -outW / 2, -outH / 2, outW, outH);
+  // ⚠️ 目标框必须用**未对调**的 tw/th。
+  // 旋转是交给 CTM 做的：把一个 tw×th 的框转 90° 自然就得到 outW×outH。
+  // 曾经这里写成 -outW/2, -outH/2, outW, outH（对调后的尺寸），于是源矩形被
+  // 非等比拉伸 —— 非正方形图旋转 90°/270° 会被压进画布**中间一半**并左右溢出，
+  // 上下留出透明空带（80×40 实测：内容只占 y∈[20,60]）。2026-10-03 修复。
+  ctx.drawImage(img, crop?.x ?? 0, crop?.y ?? 0, srcW, srcH, -tw / 2, -th / 2, tw, th);
   ctx.restore();
 
   return canvas;

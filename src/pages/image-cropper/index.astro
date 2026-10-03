@@ -3,7 +3,7 @@ import ToolPage from '../../components/ToolPage.astro';
 ---
 <ToolPage slug="image-cropper" actionLabel="裁剪并下载" icon="✂️" resultTitle="裁剪结果">
   <div class="crop-stage" data-crop-stage hidden>
-    <div class="param-label">拖动四角调整裁剪区域，可整体拖动；可先旋转或翻转</div>
+    <div class="param-label">可先旋转或翻转，再拖动四角调整裁剪区域；预览会同步旋转</div>
     <div class="crop-canvas-wrap" data-crop-wrap>
       <canvas data-crop-canvas></canvas>
     </div>

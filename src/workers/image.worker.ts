@@ -54,7 +54,10 @@ self.onmessage = async (ev: MessageEvent<WorkerReq>) => {
     if (opts.rotate) ctx.rotate((opts.rotate * Math.PI) / 180);
     if (opts.flipH) ctx.scale(-1, 1);
     if (opts.flipV) ctx.scale(1, -1);
-    ctx.drawImage(bmp, crop?.x ?? 0, crop?.y ?? 0, srcW, srcH, -outW / 2, -outH / 2, outW, outH);
+    // ⚠️ 目标框用**未对调**的 tw/th，与主线程 imageToCanvas 保持一致。
+    // 用对调后的 outW/outH 会把源矩形非等比拉伸：非正方形图旋转 90°/270°
+    // 会被压进画布中间一半并左右溢出（2026-10-03 修复）。
+    ctx.drawImage(bmp, crop?.x ?? 0, crop?.y ?? 0, srcW, srcH, -tw / 2, -th / 2, tw, th);
     ctx.restore();
     bmp.close?.();
 
