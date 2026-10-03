@@ -1,5 +1,10 @@
 ---
-import { toolsByCategory } from '../data/tools';
+import { toolCategories, toolsByCategory } from '../data/tools';
+
+// 直接由分类元数据生成，避免「新增分类忘了补底部」——之前就漏了 PDF / 二维码 / Favicon / Markdown。
+const groups = toolCategories
+  .map((cat) => ({ ...cat, items: toolsByCategory(cat.key) }))
+  .filter((g) => g.items.length > 0);
 ---
 
 <footer class="site-footer">
@@ -14,25 +19,19 @@ import { toolsByCategory } from '../data/tools';
           </span>
           <span>CunConvert</span>
         </a>
-        <p>本地图片与 SVG 工具箱：格式转换、压缩、调整尺寸、裁剪、SVG 优化与矢量化。所有文件均在浏览器本地处理，不会上传到任何服务器。</p>
+        <p>本地文件工具箱：图片与 SVG 转换、压缩、裁剪、矢量化，以及 PDF、二维码、Favicon 与 Markdown 编辑。所有文件均在浏览器本地处理，不会上传到任何服务器。</p>
         <p class="footer-legal"><a href="/privacy/">隐私政策</a><span class="dot">·</span><a href="/about/">关于我们</a></p>
       </div>
-      <div class="footer-col">
-        <h4>SVG 工具</h4>
-        {toolsByCategory('svg').map((t) => <a href={`/${t.slug}/`}>{t.name}</a>)}
-      </div>
-      <div class="footer-col">
-        <h4>图片转换</h4>
-        {toolsByCategory('convert').map((t) => <a href={`/${t.slug}/`}>{t.name}</a>)}
-      </div>
-      <div class="footer-col">
-        <h4>图片处理</h4>
-        {toolsByCategory('image').map((t) => <a href={`/${t.slug}/`}>{t.name}</a>)}
-      </div>
-      <div class="footer-col">
-        <h4>图片矢量化</h4>
-        {toolsByCategory('vector').map((t) => <a href={`/${t.slug}/`}>{t.name}</a>)}
-      </div>
+      {
+        groups.map((g) => (
+          <div class="footer-col">
+            <h4>{g.label}</h4>
+            {g.items.map((t) => (
+              <a href={`/${t.slug}/`}>{t.name}</a>
+            ))}
+          </div>
+        ))
+      }
     </div>
     <div class="footer-note">CunConvert © {new Date().getFullYear()} · 所有处理均在浏览器本地完成，文件不会上传服务器</div>
   </div>
