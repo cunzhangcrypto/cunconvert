@@ -1188,3 +1188,166 @@ input[type="color"].input-color {
   display: inline-block;
   vertical-align: -2px;
 }
+
+/* ===== 安全工具（密码 / 密钥 / Hash） ===== */
+.sec-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px 18px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 66px;
+}
+.sec-output {
+  flex: 1;
+  min-width: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  letter-spacing: 0.4px;
+  word-break: break-all;
+  color: var(--text);
+  user-select: all;
+}
+.sec-output.placeholder {
+  font-family: var(--font);
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--text-faint);
+  user-select: none;
+}
+.sec-result .btn-small { flex: none; }
+
+.sec-meta {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 密码强度 */
+.sec-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.sec-strength-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-tint);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sec-strength-bar i {
+  display: block;
+  height: 100%;
+  width: 5%;
+  border-radius: 999px;
+  background: var(--danger);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+.sec-strength[data-level='medium'] .sec-strength-bar i { background: var(--warn); }
+.sec-strength[data-level='strong'] .sec-strength-bar i { background: var(--accent); }
+.sec-strength[data-level='very-strong'] .sec-strength-bar i { background: var(--accent-strong); }
+.sec-strength-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+
+/* 参数区 */
+.sec-fields {
+  margin-top: 22px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px 22px;
+}
+.sec-span { grid-column: 1 / -1; }
+.sec-custom { margin-top: 10px; }
+.sec-inline-note { margin: 0; }
+.sec-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+.sec-check-wide { flex-basis: 100%; }
+
+/* 使用场景 */
+.sec-uses { margin-top: 24px; }
+.sec-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+.sec-chip {
+  font-size: 12.5px;
+  color: var(--text-soft);
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 12px;
+}
+
+/* Hash 页签与面板 */
+.sec-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+}
+.sec-tab {
+  flex: 1 1 0;
+  padding: 9px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 550;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.sec-tab:hover { color: var(--text); }
+.sec-tab.active {
+  background: var(--card);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.sec-panel[hidden] { display: none; }
+.sec-algo { margin-bottom: 20px; }
+.sec-warn { margin-top: 10px; }
+.sec-textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+}
+.sec-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  background: var(--card);
+}
+
+.sec-tip {
+  margin: 16px 0 0;
+  font-size: 12px;
+  color: var(--text-faint);
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  .sec-result { padding: 14px; }
+  .sec-output { font-size: 1rem; }
+}

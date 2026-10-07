@@ -6,7 +6,8 @@ export type ToolCategory =
   | 'pdf'
   | 'qr'
   | 'favicon'
-  | 'markdown';
+  | 'markdown'
+  | 'security';
 
 export interface ToolMeta {
   slug: string;
@@ -30,6 +31,7 @@ export const toolCategories: { key: ToolCategory; label: string; icon: string }[
   { key: 'qr', label: '二维码', icon: '▩' },
   { key: 'favicon', label: 'Favicon', icon: '◎' },
   { key: 'markdown', label: 'Markdown', icon: '✎' },
+  { key: 'security', label: '安全工具', icon: '🔐' },
 ];
 
 export const tools: ToolMeta[] = [
@@ -406,6 +408,50 @@ export const tools: ToolMeta[] = [
     accept: '.md,.markdown,.txt,text/markdown,text/plain',
     category: 'markdown',
     related: ['image-to-pdf', 'qr-generator', 'favicon-generator', 'svg-viewer'],
+  },
+
+  // ===== 安全工具 =====
+  {
+    slug: 'password-generator',
+    name: '密码生成器',
+    short: '在浏览器本地生成高强度随机密码，不上传、不保存',
+    title: '密码生成器 - 在线生成安全随机密码 | CunConvert',
+    description:
+      '在线生成高强度随机密码。使用浏览器加密安全随机数在本地生成，不上传、不保存。支持自定义长度、大小写字母、数字与特殊符号，并可排除容易混淆的字符。',
+    h1: '密码生成器',
+    intro:
+      '在浏览器本地随机生成高强度密码。随机数来自浏览器的加密安全接口，生成结果不会上传、也不会被保存。可自定义长度与字符类型，并支持排除容易混淆的字符。',
+    accept: '',
+    category: 'security',
+    related: ['key-generator', 'hash-generator', 'qr-generator', 'markdown-editor'],
+  },
+  {
+    slug: 'key-generator',
+    name: '随机密钥生成器',
+    short: '生成 Hex / Base64 / Base64URL 随机密钥，支持 128–512 bit',
+    title: '随机密钥生成器 - 在线生成安全随机 Key | CunConvert',
+    description:
+      '在线生成随机密钥（Secret / API Key）。使用浏览器加密安全随机数在本地生成，不上传、不保存。支持 Hex、Base64、Base64URL 输出，以及 128 / 192 / 256 / 512 bit 长度。',
+    h1: '随机密钥生成器',
+    intro:
+      '为开发者生成随机 Secret / Key：支持 Hex、Base64、Base64URL 三种输出格式与 128–512 bit 长度。随机数来自浏览器加密安全接口，密钥仅在当前页面中生成，不会上传或保存。',
+    accept: '',
+    category: 'security',
+    related: ['password-generator', 'hash-generator', 'qr-generator', 'svg-viewer'],
+  },
+  {
+    slug: 'hash-generator',
+    name: 'Hash 生成器',
+    short: '本地计算文本或文件的 MD5、SHA-1、SHA-256、SHA-384、SHA-512',
+    title: 'Hash 生成器 - 在线计算 MD5、SHA-256、SHA-512 | CunConvert',
+    description:
+      '在线计算文本或文件的 Hash 值。支持 MD5、SHA-1、SHA-256、SHA-384、SHA-512，文件和文本均在浏览器本地计算，文件不会上传，适合文件完整性校验与下载验证。',
+    h1: 'Hash 生成器',
+    intro:
+      '计算文本或文件的 Hash 值，用于文件完整性校验、下载验证与开发测试。支持 SHA-256 / SHA-384 / SHA-512 与兼容用的 SHA-1 / MD5，全部在浏览器本地计算，文件不会上传。',
+    accept: '',
+    category: 'security',
+    related: ['password-generator', 'key-generator', 'image-compressor', 'svg-viewer'],
   },
 ];
 

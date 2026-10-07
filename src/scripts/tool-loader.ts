@@ -32,6 +32,9 @@ const map: Record<string, () => Promise<ToolModule>> = {
   'qr-generator': () => import('./qr-generator'),
   'favicon-generator': () => import('./favicon-generator'),
   'markdown-editor': () => import('./markdown-editor'),
+  'password-generator': () => import('./password-generator'),
+  'key-generator': () => import('./key-generator'),
+  'hash-generator': () => import('./hash-generator'),
 };
 
 export async function mountTool(root: HTMLElement, slug: string): Promise<void> {

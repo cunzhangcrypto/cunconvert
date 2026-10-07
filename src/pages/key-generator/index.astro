@@ -1,0 +1,52 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="key-generator" shell="workspace">
+  <div class="sec-result">
+    <span class="sec-output placeholder" data-kg-output>正在生成…</span>
+    <button type="button" class="btn-small" data-kg-copy hidden>复制</button>
+  </div>
+  <div class="sec-meta" data-kg-meta>256 bit = 32 bytes</div>
+
+  <div class="sec-fields">
+    <div class="param-block">
+      <div class="param-label">输出格式</div>
+      <div class="seg" data-param="kg-format">
+        <button type="button" data-value="hex" class="active">Hex</button>
+        <button type="button" data-value="base64">Base64</button>
+        <button type="button" data-value="base64url">Base64URL</button>
+      </div>
+      <div class="param-note">三种格式随机性相同，只是编码方式不同</div>
+    </div>
+
+    <div class="param-block">
+      <div class="param-label">密钥长度</div>
+      <div class="seg" data-param="kg-bits">
+        <button type="button" data-value="128">128 bit</button>
+        <button type="button" data-value="192">192 bit</button>
+        <button type="button" data-value="256" class="active">256 bit</button>
+        <button type="button" data-value="512">512 bit</button>
+      </div>
+      <div class="param-note">推荐使用 256 bit</div>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="button" class="btn-primary" data-kg-generate>重新生成</button>
+  </div>
+
+  <div class="sec-uses">
+    <div class="param-label">适用于</div>
+    <div class="sec-chips">
+      <span class="sec-chip">API Secret</span>
+      <span class="sec-chip">JWT Secret</span>
+      <span class="sec-chip">Webhook Secret</span>
+      <span class="sec-chip">AES 密钥</span>
+      <span class="sec-chip">环境变量 Secret</span>
+    </div>
+    <div class="param-note">是否适用于某个算法，取决于该算法对密钥长度与格式的要求，请以对应文档为准。</div>
+  </div>
+
+  <div data-notice></div>
+  <p class="sec-tip">🔒 所有数据均在浏览器本地处理，不会上传到服务器。密钥仅在当前浏览器中生成，不会上传或保存。</p>
+</ToolPage>

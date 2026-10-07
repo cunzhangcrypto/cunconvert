@@ -29,4 +29,7 @@ export const toolIcons: Record<string, string> = {
   'qr-generator': '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3z"/><path d="M20 14v3"/><path d="M14 20h3"/><path d="M20 20h1"/>',
   'favicon-generator': '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 7l1.6 3.3 3.4.5-2.5 2.4.6 3.4-3.1-1.7-3.1 1.7.6-3.4L7 10.8l3.4-.5z"/>',
   'markdown-editor': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 15.5V9l3 3 3-3v6.5"/><path d="M16.5 9v4.5"/><path d="M14.5 12l2 2 2-2"/>',
+  'password-generator': '<rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/><circle cx="12" cy="14.5" r="1.3"/><path d="M12 15.8V17.5"/>',
+  'key-generator': '<circle cx="8" cy="14" r="4"/><path d="M11.2 11.2L20 2.5"/><path d="M17.5 5l3 3"/><path d="M15 7.5l3 3"/>',
+  'hash-generator': '<path d="M4 9h16M4 15h16"/><path d="M9.5 4L7.5 20M17 4l-2 16"/>',
 };

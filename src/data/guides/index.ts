@@ -7,6 +7,7 @@ import { pdfGuides } from './pdf';
 import { qrGuides } from './qr';
 import { faviconGuides } from './favicon';
 import { markdownGuides } from './markdown';
+import { securityGuides } from './security';
 
 export const guides: Record<string, ToolGuide> = {
   ...svgGuides,
@@ -17,6 +18,7 @@ export const guides: Record<string, ToolGuide> = {
   ...qrGuides,
   ...faviconGuides,
   ...markdownGuides,
+  ...securityGuides,
 };
 
 export function getGuide(slug: string): ToolGuide | undefined {

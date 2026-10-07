@@ -1,0 +1,63 @@
+---
+import ToolPage from '../../components/ToolPage.astro';
+---
+<ToolPage slug="hash-generator" shell="workspace">
+  <div class="sec-tabs" role="tablist">
+    <button type="button" class="sec-tab active" data-hash-mode="text" role="tab">文本 Hash</button>
+    <button type="button" class="sec-tab" data-hash-mode="file" role="tab">文件 Hash</button>
+  </div>
+
+  <div class="param-block sec-algo">
+    <div class="param-label">算法</div>
+    <div class="seg" data-param="hash-algo">
+      <button type="button" data-value="SHA-256" class="active">SHA-256</button>
+      <button type="button" data-value="SHA-384">SHA-384</button>
+      <button type="button" data-value="SHA-512">SHA-512</button>
+      <button type="button" data-value="SHA-1">SHA-1</button>
+      <button type="button" data-value="MD5">MD5</button>
+    </div>
+    <div class="param-note">SHA-256 / SHA-384 / SHA-512 为推荐算法；SHA-1 与 MD5 仅用于兼容旧系统或普通校验。</div>
+    <div class="notice warn sec-warn" data-hash-warn hidden>
+      不建议用于安全相关用途：SHA-1 与 MD5 存在已知碰撞风险，请仅在兼容旧系统或普通文件校验时使用。
+    </div>
+  </div>
+
+  <section class="sec-panel" data-hash-panel="text">
+    <div class="param-label">文本内容</div>
+    <textarea
+      class="sec-textarea"
+      data-hash-text
+      rows="5"
+      placeholder="请输入需要计算 Hash 的内容"
+      aria-label="需要计算 Hash 的文本"></textarea>
+
+    <div class="sec-result">
+      <span class="sec-output placeholder" data-hash-output>输入内容后点击「计算 Hash」</span>
+      <button type="button" class="btn-small" data-hash-copy hidden>复制</button>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-primary" data-hash-run>计算 Hash</button>
+      <button type="button" class="btn-secondary" data-hash-clear>清空</button>
+    </div>
+  </section>
+
+  <section class="sec-panel" data-hash-panel="file" hidden>
+    <div class="upload-zone" data-dropzone>
+      <span class="uz-icon">#️⃣</span>
+      <p class="uz-main">点击 <button type="button" class="link" data-browse>选择文件</button>，或将文件拖拽到此处</p>
+      <p class="uz-sub">文件在浏览器本地计算，不会上传</p>
+      <input type="file" hidden data-file-input />
+    </div>
+
+    <div class="sec-meta" data-hash-file-meta></div>
+
+    <div class="sec-result">
+      <span class="sec-output placeholder" data-hash-file-output>选择或拖入文件后自动计算</span>
+      <button type="button" class="btn-small" data-hash-file-copy hidden>复制 Hash</button>
+    </div>
+  </section>
+
+  <div data-notice></div>
+  <p class="sec-tip">🔒 所有数据均在浏览器本地处理，不会上传到服务器。文件和文本均在本地计算，文件不会上传。</p>
+</ToolPage>
